@@ -1,0 +1,386 @@
+
+using RestaurantFlow.ConsoleUI.OCPExamples.Interfaces;
+
+namespace RestaurantFlow.ConsoleUI.OCPExamples.Payments
+{
+    public class CashPayment : IPaymentMethod
+    {
+        public decimal ReceivedAmount { get; set; }
+
+        public void Pay(decimal amount)
+        {
+            Console.WriteLine("===== NAKÝT ÖDEME =====");
+
+            if (amount <= 0)
+            {
+                Console.WriteLine("Geçersiz ödeme tutarý.");
+                return;
+            }
+
+            Console.WriteLine("Ödenecek Tutar: " + amount + " TL");
+            Console.WriteLine("Alýnan Nakit: " + ReceivedAmount + " TL");
+
+            if (ReceivedAmount < amount)
+            {
+                decimal missingAmount = amount - ReceivedAmount;
+
+                Console.WriteLine("Ödeme için yeterli nakit bulunmuyor.");
+                Console.WriteLine("Eksik Tutar: " + missingAmount + " TL");
+                return;
+            }
+
+            decimal change = ReceivedAmount - amount;
+
+            Console.WriteLine("Nakit ödeme kabul edildi.");
+            Console.WriteLine("Para Üstü: " + change + " TL");
+            Console.WriteLine("Ödeme tamamlandý.");
+        }
+    }
+}
+
+---------------------------------------------------------------------------------------------
+
+
+using RestaurantFlow.ConsoleUI.OCPExamples.Interfaces;
+
+namespace RestaurantFlow.ConsoleUI.OCPExamples.Payments
+{
+    public class CreditCardPayment : IPaymentMethod
+    {
+        public string CardHolderName { get; set; } = "";
+        public string CardNumber { get; set; } = "";
+        public decimal CardLimit { get; set; }
+
+        public void Pay(decimal amount)
+        {
+            Console.WriteLine("===== KREDÝ KARTI ÖDEMESÝ =====");
+
+            if (amount <= 0)
+            {
+                Console.WriteLine("Geçersiz ödeme tutarý.");
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(CardHolderName))
+            {
+                Console.WriteLine("Kart sahibi bilgisi eksik.");
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(CardNumber))
+            {
+                Console.WriteLine("Kart numarasý girilmedi.");
+                return;
+            }
+
+            Console.WriteLine("Kart Sahibi: " + CardHolderName);
+            Console.WriteLine("Ödeme Tutarý: " + amount + " TL");
+
+            if (CardLimit < amount)
+            {
+                Console.WriteLine("Kart limiti yetersiz.");
+                Console.WriteLine("Kullanýlabilir Limit: " + CardLimit + " TL");
+                return;
+            }
+
+            Console.WriteLine("POS cihazýna baðlanýlýyor...");
+            Console.WriteLine("Banka onayý kontrol ediliyor...");
+
+            CardLimit -= amount;
+
+            Console.WriteLine("Banka iþlemi onaylandý.");
+            Console.WriteLine("Kalan Limit: " + CardLimit + " TL");
+            Console.WriteLine("Kredi kartý ödemesi tamamlandý.");
+        }
+    }
+}
+
+
+
+---------------------------------------------------------------------------------------------
+
+using RestaurantFlow.ConsoleUI.OCPExamples.Interfaces;
+
+namespace RestaurantFlow.ConsoleUI.OCPExamples.Payments
+{
+    public class MealCardPayment : IPaymentMethod
+    {
+        public string CardProvider { get; set; } = "";
+        public string CustomerName { get; set; } = "";
+        public decimal Balance { get; set; }
+
+        public void Pay(decimal amount)
+        {
+            Console.WriteLine("===== YEMEK KARTI ÖDEMESÝ =====");
+
+            if (amount <= 0)
+            {
+                Console.WriteLine("Geçersiz ödeme tutarý.");
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(CardProvider))
+            {
+                Console.WriteLine("Yemek kartý saðlayýcýsý belirtilmedi.");
+                return;
+            }
+
+            Console.WriteLine("Kart Saðlayýcýsý: " + CardProvider);
+            Console.WriteLine("Müþteri: " + CustomerName);
+            Console.WriteLine("Mevcut Bakiye: " + Balance + " TL");
+            Console.WriteLine("Ödeme Tutarý: " + amount + " TL");
+
+            if (Balance < amount)
+            {
+                Console.WriteLine("Yemek kartý bakiyesi yetersiz.");
+                Console.WriteLine(
+                    "Eksik Tutar: " + (amount - Balance) + " TL");
+
+                return;
+            }
+
+            Balance -= amount;
+
+            Console.WriteLine("Yemek kartý ödemesi onaylandý.");
+            Console.WriteLine("Kalan Bakiye: " + Balance + " TL");
+            Console.WriteLine("Ödeme tamamlandý.");
+        }
+    }
+}
+
+
+
+---------------------------------------------------------------------------------------------
+
+using RestaurantFlow.ConsoleUI.OCPExamples.Interfaces;
+using RestaurantFlow.ConsoleUI.OCPExamples.Payments;
+
+CashPayment cashPayment = new CashPayment();
+cashPayment.ReceivedAmount = 1000;
+
+CreditCardPayment creditCardPayment = new CreditCardPayment();
+creditCardPayment.CardHolderName = "Ahmet Yýlmaz";
+creditCardPayment.CardNumber = "DemoCard-001";
+creditCardPayment.CardLimit = 10000;
+
+MealCardPayment mealCardPayment = new MealCardPayment();
+mealCardPayment.CardProvider = "RestaurantCard";
+mealCardPayment.CustomerName = "Zeynep Demir";
+mealCardPayment.Balance = 2500;
+
+Console.WriteLine("=== RESTAURANTFLOW ÖDEME SÝSTEMÝ ===");
+
+Console.WriteLine();
+
+cashPayment.Pay(850);
+
+Console.WriteLine();
+
+creditCardPayment.Pay(1250);
+
+Console.WriteLine();
+
+mealCardPayment.Pay(600);
+
+Console.ReadLine();
+
+
+---------------------------------------------------------------------------------------------
+
+
+using RestaurantFlow.ConsoleUI.OCPExamples.Interfaces;
+
+namespace RestaurantFlow.ConsoleUI.OCPExamples.Payments
+{
+    public class QrCodePayment : IPaymentMethod
+    {
+        public string CustomerName { get; set; } = "";
+        public string BankName { get; set; } = "";
+        public decimal AccountBalance { get; set; }
+        public bool IsQrScanned { get; set; }
+        public bool IsPaymentApproved { get; private set; }
+
+        public void Pay(decimal amount)
+        {
+            Console.WriteLine("===== QR KOD ÝLE ÖDEME =====");
+
+            if (amount <= 0)
+            {
+                Console.WriteLine("Geçersiz ödeme tutarý.");
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(CustomerName))
+            {
+                Console.WriteLine("Müþteri bilgisi bulunamadý.");
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(BankName))
+            {
+                Console.WriteLine("Banka seçilmedi.");
+                return;
+            }
+
+            Console.WriteLine("Müþteri: " + CustomerName);
+            Console.WriteLine("Banka: " + BankName);
+            Console.WriteLine("Ödeme Tutarý: " + amount + " TL");
+
+            Console.WriteLine("QR kod hazýrlanýyor...");
+            Console.WriteLine("QR kod ödeme ekranýnda gösterildi.");
+
+            if (!IsQrScanned)
+            {
+                Console.WriteLine("Müþteri QR kodu henüz okutmadý.");
+                return;
+            }
+
+            Console.WriteLine("QR kod baþarýyla okutuldu.");
+            Console.WriteLine("Mobil bankacýlýk uygulamasý kontrol ediliyor.");
+
+            if (AccountBalance < amount)
+            {
+                Console.WriteLine("Hesap bakiyesi yetersiz.");
+                Console.WriteLine(
+                    "Eksik Tutar: " + (amount - AccountBalance) + " TL");
+
+                return;
+            }
+
+            Console.WriteLine("Hesap bakiyesi yeterli.");
+
+            AccountBalance -= amount;
+
+            IsPaymentApproved = true;
+
+            Console.WriteLine("Banka ödeme onayý alýndý.");
+            Console.WriteLine("Ýþlem tamamlandý.");
+            Console.WriteLine("Kalan Bakiye: " + AccountBalance + " TL");
+        }
+
+        public void ShowPaymentStatus()
+        {
+            Console.WriteLine("===== QR ÖDEME DURUMU =====");
+            Console.WriteLine("Müþteri: " + CustomerName);
+            Console.WriteLine("Banka: " + BankName);
+
+            if (IsPaymentApproved)
+            {
+                Console.WriteLine("Ödeme Durumu: Onaylandý");
+            }
+            else
+            {
+                Console.WriteLine("Ödeme Durumu: Onaylanmadý");
+            }
+        }
+
+        public void ResetPayment()
+        {
+            IsQrScanned = false;
+            IsPaymentApproved = false;
+
+            Console.WriteLine("QR ödeme durumu sýfýrlandý.");
+        }
+    }
+}
+
+
+---------------------------------------------------------------------------------------------
+
+
+using RestaurantFlow.ConsoleUI.OCPExamples.Payments;
+
+QrCodePayment qrPayment = new QrCodePayment();
+
+qrPayment.CustomerName = "Mehmet Yýlmaz";
+qrPayment.BankName = "Restaurant Bank";
+qrPayment.AccountBalance = 5000;
+qrPayment.IsQrScanned = true;
+
+Console.WriteLine("=== RESTAURANTFLOW QR ÖDEME ===");
+
+qrPayment.Pay(1250);
+
+Console.WriteLine();
+
+qrPayment.ShowPaymentStatus();
+
+Console.ReadLine();
+
+
+
+---------------------------------------------------------------------------------------------
+
+QrCodePayment payment1 = new QrCodePayment();
+
+payment1.CustomerName = "Ayþe Demir";
+payment1.BankName = "Restaurant Bank";
+payment1.AccountBalance = 3000;
+payment1.IsQrScanned = false;
+
+payment1.Pay(900);
+
+---------------------------------------------------------------------------------------------
+
+QrCodePayment payment2 = new QrCodePayment();
+
+payment2.CustomerName = "Zeynep Kaya";
+payment2.BankName = "Restaurant Bank";
+payment2.AccountBalance = 400;
+payment2.IsQrScanned = true;
+
+payment2.Pay(1200);
+
+
+---------------------------------------------------------------------------------------------
+
+
+using RestaurantFlow.ConsoleUI.OCPExamples.Interfaces;
+using RestaurantFlow.ConsoleUI.OCPExamples.Payments;
+
+CashPayment cashPayment = new CashPayment();
+cashPayment.ReceivedAmount = 1000;
+
+CreditCardPayment creditCardPayment = new CreditCardPayment();
+creditCardPayment.CardHolderName = "Ahmet Yýlmaz";
+creditCardPayment.CardNumber = "DemoCard-001";
+creditCardPayment.CardLimit = 10000;
+
+MealCardPayment mealCardPayment = new MealCardPayment();
+mealCardPayment.CardProvider = "RestaurantCard";
+mealCardPayment.CustomerName = "Zeynep Demir";
+mealCardPayment.Balance = 2500;
+
+QrCodePayment qrPayment = new QrCodePayment();
+qrPayment.CustomerName = "Mehmet Yýlmaz";
+qrPayment.BankName = "Restaurant Bank";
+qrPayment.AccountBalance = 5000;
+qrPayment.IsQrScanned = true;
+
+// Bütün ödeme yöntemlerini ayný listede tutuyoruz.
+List<IPaymentMethod> paymentMethods = new List<IPaymentMethod>();
+
+paymentMethods.Add(cashPayment);
+paymentMethods.Add(creditCardPayment);
+paymentMethods.Add(mealCardPayment);
+paymentMethods.Add(qrPayment);
+
+// Ödeme tutarlarý
+decimal[] paymentAmounts = { 850, 1250, 600, 900 };
+
+Console.WriteLine("=== RESTAURANTFLOW ÖDEME SÝSTEMÝ ===");
+
+for (int i = 0; i < paymentMethods.Count; i++)
+{
+    paymentMethods[i].Pay(paymentAmounts[i]);
+
+    Console.WriteLine();
+    Console.WriteLine("------------------------------");
+    Console.WriteLine();
+}
+
+Console.ReadLine();
+
+
+
+---------------------------------------------------------------------------------------------

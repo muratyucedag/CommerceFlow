@@ -1,0 +1,224 @@
+
+using RestaurantFlow.ConsoleUI.LSPExamples.Interfaces;
+
+namespace RestaurantFlow.ConsoleUI.LSPExamples.BadExamples
+{
+    public class FakePayment : IPaymentProcessor
+    {
+        public decimal Balance { get; set; } = 300;
+
+        public bool ProcessPayment(decimal amount)
+        {
+            Console.WriteLine("===== HATALI ÖDEME SÝSTEMÝ =====");
+
+            Console.WriteLine("Mevcut Bakiye: " + Balance + " TL");
+            Console.WriteLine("Ödeme Tutarý: " + amount + " TL");
+
+            if (Balance < amount)
+            {
+                Console.WriteLine("Bakiye yetersiz.");
+
+                // HATALI: Ödeme gerçekleþmediði halde
+                // baþarýlý sonucu döndürülüyor.
+                return true;
+            }
+
+            Balance -= amount;
+
+            Console.WriteLine("Ödeme tamamlandý.");
+
+            return true;
+        }
+    }
+}
+
+----------------------------------------------------------------------------------
+
+using RestaurantFlow.ConsoleUI.LSPExamples.Interfaces;
+using RestaurantFlow.ConsoleUI.LSPExamples.BadExamples;
+
+IPaymentProcessor payment = new FakePayment();
+
+bool result = payment.ProcessPayment(850);
+
+Console.WriteLine();
+
+if (result)
+{
+    Console.WriteLine("Sipariþ ödemesi baþarýlý kabul edildi.");
+    Console.WriteLine("Sipariþ mutfaða yönlendiriliyor.");
+}
+else
+{
+    Console.WriteLine("Sipariþ ödemesi baþarýsýz.");
+}
+
+Console.ReadLine();
+
+
+----------------------------------------------------------------------------------
+
+
+using RestaurantFlow.ConsoleUI.LSPExamples.Interfaces;
+
+namespace RestaurantFlow.ConsoleUI.LSPExamples.Payments
+{
+    public class CashPayment : IPaymentProcessor
+    {
+        public decimal ReceivedAmount { get; set; }
+
+        public bool ProcessPayment(decimal amount)
+        {
+            Console.WriteLine("===== NAKÝT ÖDEME =====");
+
+            if (amount <= 0)
+            {
+                Console.WriteLine("Geçersiz ödeme tutarý.");
+                return false;
+            }
+
+            Console.WriteLine("Ödenecek Tutar: " + amount + " TL");
+            Console.WriteLine("Alýnan Nakit: " + ReceivedAmount + " TL");
+
+            if (ReceivedAmount < amount)
+            {
+                Console.WriteLine("Nakit tutarý yetersiz.");
+
+                Console.WriteLine(
+                    "Eksik Tutar: " + (amount - ReceivedAmount) + " TL");
+
+                return false;
+            }
+
+            decimal change = ReceivedAmount - amount;
+
+            ReceivedAmount -= amount;
+
+            Console.WriteLine("Nakit ödeme gerçekleþtirildi.");
+            Console.WriteLine("Para Üstü: " + change + " TL");
+            Console.WriteLine("Ödeme baþarýyla tamamlandý.");
+
+            return true;
+        }
+    }
+}
+
+
+
+----------------------------------------------------------------------------------
+
+
+using RestaurantFlow.ConsoleUI.LSPExamples.Interfaces;
+
+namespace RestaurantFlow.ConsoleUI.LSPExamples.Payments
+{
+    public class CreditCardPayment : IPaymentProcessor
+    {
+        public string CardHolder { get; set; } = "";
+        public decimal AvailableLimit { get; set; }
+
+        public bool ProcessPayment(decimal amount)
+        {
+            Console.WriteLine("===== KREDÝ KARTI ÖDEMESÝ =====");
+
+            if (amount <= 0)
+            {
+                Console.WriteLine("Geçersiz ödeme tutarý.");
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(CardHolder))
+            {
+                Console.WriteLine("Kart sahibi bilgisi bulunamadý.");
+                return false;
+            }
+
+            Console.WriteLine("Kart Sahibi: " + CardHolder);
+            Console.WriteLine("Ödeme Tutarý: " + amount + " TL");
+            Console.WriteLine("Kullanýlabilir Limit: " + AvailableLimit + " TL");
+
+            if (AvailableLimit < amount)
+            {
+                Console.WriteLine("Kart limiti yetersiz.");
+                return false;
+            }
+
+            Console.WriteLine("POS iþlemi gerçekleþtiriliyor.");
+            Console.WriteLine("Ödeme onayý kontrol ediliyor.");
+
+            AvailableLimit -= amount;
+
+            Console.WriteLine("Ödeme onaylandý.");
+            Console.WriteLine("Kalan Limit: " + AvailableLimit + " TL");
+
+            return true;
+        }
+    }
+}
+
+----------------------------------------------------------------------------------
+
+
+using RestaurantFlow.ConsoleUI.LSPExamples.Interfaces;
+using RestaurantFlow.ConsoleUI.LSPExamples.Payments;
+
+CashPayment cashPayment = new CashPayment();
+cashPayment.ReceivedAmount = 1000;
+
+CreditCardPayment creditCardPayment = new CreditCardPayment();
+creditCardPayment.CardHolder = "Ahmet Yýlmaz";
+creditCardPayment.AvailableLimit = 5000;
+
+List<IPaymentProcessor> paymentProcessors =
+    new List<IPaymentProcessor>();
+
+paymentProcessors.Add(cashPayment);
+paymentProcessors.Add(creditCardPayment);
+
+decimal[] amounts = { 850, 1250 };
+
+Console.WriteLine("=== RESTAURANTFLOW ÖDEME SÝSTEMÝ ===");
+
+for (int i = 0; i < paymentProcessors.Count; i++)
+{
+    Console.WriteLine();
+
+    bool result =
+        paymentProcessors[i].ProcessPayment(amounts[i]);
+
+    if (result)
+    {
+        Console.WriteLine("Ödeme baþarýlý.");
+        Console.WriteLine("Sipariþ mutfaða gönderilebilir.");
+    }
+    else
+    {
+        Console.WriteLine("Ödeme baþarýsýz.");
+        Console.WriteLine("Sipariþ beklemeye alýndý.");
+    }
+
+    Console.WriteLine("--------------------------");
+}
+
+Console.ReadLine();
+
+
+
+----------------------------------------------------------------------------------
+
+CreditCardPayment payment = new CreditCardPayment();
+
+payment.CardHolder = "Mehmet Kaya";
+payment.AvailableLimit = 300;
+
+bool result = payment.ProcessPayment(850);
+
+Console.WriteLine("Ödeme Sonucu: " + result);
+Console.WriteLine("Kalan Limit: " + payment.AvailableLimit);
+
+
+----------------------------------------------------------------------------------
+----------------------------------------------------------------------------------
+----------------------------------------------------------------------------------
+----------------------------------------------------------------------------------
+----------------------------------------------------------------------------------

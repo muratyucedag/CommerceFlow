@@ -1,0 +1,339 @@
+----------------------------------------------------------------------------------
+
+
+namespace RestaurantFlow.ConsoleUI.DIPExamples.BadExamples
+{
+    public class SmsService
+    {
+        public void SendSms(string phoneNumber, string message)
+        {
+            if (string.IsNullOrWhiteSpace(phoneNumber))
+            {
+                Console.WriteLine("Telefon numarasý bulunamadý.");
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(message))
+            {
+                Console.WriteLine("SMS mesajý boþ olamaz.");
+                return;
+            }
+
+            Console.WriteLine("===== SMS SERVÝSÝ =====");
+            Console.WriteLine("Alýcý: " + phoneNumber);
+            Console.WriteLine("Mesaj: " + message);
+            Console.WriteLine("SMS bildirimi oluþturuldu.");
+        }
+    }
+}
+
+
+
+----------------------------------------------------------------------------------
+
+
+namespace RestaurantFlow.ConsoleUI.DIPExamples.BadExamples
+{
+    public class OrderManager
+    {
+        public int TotalOrders { get; private set; }
+        public decimal TotalSales { get; private set; }
+
+        public void CreateOrder(
+            int orderId,
+            string customerName,
+            string phoneNumber,
+            string productName,
+            int quantity,
+            decimal unitPrice)
+        {
+            Console.WriteLine("===== YENÝ SÝPARÝÞ =====");
+
+            if (orderId <= 0 ||
+                string.IsNullOrWhiteSpace(customerName) ||
+                string.IsNullOrWhiteSpace(phoneNumber) ||
+                string.IsNullOrWhiteSpace(productName) ||
+                quantity <= 0 ||
+                unitPrice <= 0)
+            {
+                Console.WriteLine("Sipariþ bilgileri geçersiz.");
+                return;
+            }
+
+            decimal totalAmount = quantity * unitPrice;
+
+            TotalOrders++;
+            TotalSales += totalAmount;
+
+            Console.WriteLine("Sipariþ No: " + orderId);
+            Console.WriteLine("Müþteri: " + customerName);
+            Console.WriteLine("Ürün: " + productName);
+            Console.WriteLine("Miktar: " + quantity);
+            Console.WriteLine("Toplam: " + totalAmount + " TL");
+            Console.WriteLine("Sipariþ oluþturuldu.");
+
+            string message =
+                $"{orderId} numaralý sipariþiniz alýndý. " +
+                $"Toplam tutar: {totalAmount} TL";
+
+            // Somut SMS sýnýfýna doðrudan baðýmlýlýk
+            SmsService smsService = new SmsService();
+
+            smsService.SendSms(phoneNumber, message);
+        }
+
+        public void ShowOrderSummary()
+        {
+            Console.WriteLine("===== SÝPARÝÞ ÖZETÝ =====");
+            Console.WriteLine("Toplam Sipariþ: " + TotalOrders);
+            Console.WriteLine("Toplam Satýþ: " + TotalSales + " TL");
+        }
+    }
+}
+
+
+
+----------------------------------------------------------------------------------
+
+using RestaurantFlow.ConsoleUI.DIPExamples.BadExamples;
+
+OrderManager orderManager = new OrderManager();
+
+orderManager.CreateOrder(
+    1001,
+    "Ahmet Yýlmaz",
+    "05551234567",
+    "Hamburger Menü",
+    2,
+    350);
+
+Console.WriteLine();
+
+orderManager.ShowOrderSummary();
+
+Console.ReadLine();
+
+
+----------------------------------------------------------------------------------
+
+
+using RestaurantFlow.ConsoleUI.DIPExamples.Interfaces;
+
+namespace RestaurantFlow.ConsoleUI.DIPExamples.Services
+{
+    public class SmsService : INotificationService
+    {
+        public string ProviderName { get; set; } = "RestaurantSMS";
+        public int SentMessageCount { get; private set; }
+
+        public void SendNotification(string recipient, string message)
+        {
+            Console.WriteLine("===== SMS BÝLDÝRÝMÝ =====");
+
+            if (string.IsNullOrWhiteSpace(recipient))
+            {
+                Console.WriteLine("Telefon numarasý boþ olamaz.");
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(message))
+            {
+                Console.WriteLine("Mesaj içeriði boþ olamaz.");
+                return;
+            }
+
+            Console.WriteLine("SMS Saðlayýcýsý: " + ProviderName);
+            Console.WriteLine("Telefon Numarasý: " + recipient);
+            Console.WriteLine("Mesaj: " + message);
+
+            Console.WriteLine("SMS servisine baðlanýlýyor...");
+            Console.WriteLine("Mesaj gönderimi simüle edildi.");
+
+            SentMessageCount++;
+
+            Console.WriteLine("Gönderim Sayýsý: " + SentMessageCount);
+        }
+    }
+}
+
+
+----------------------------------------------------------------------------------
+
+
+using RestaurantFlow.ConsoleUI.DIPExamples.Interfaces;
+
+namespace RestaurantFlow.ConsoleUI.DIPExamples.Services
+{
+    public class EmailService : INotificationService
+    {
+        public string SenderEmail { get; set; } =
+            "info@restaurantflow.com";
+
+        public string EmailSubject { get; set; } =
+            "RestaurantFlow Sipariþ Bilgilendirmesi";
+
+        public int SentEmailCount { get; private set; }
+
+        public void SendNotification(string recipient, string message)
+        {
+            Console.WriteLine("===== E-POSTA BÝLDÝRÝMÝ =====");
+
+            if (string.IsNullOrWhiteSpace(recipient) ||
+                !recipient.Contains("@"))
+            {
+                Console.WriteLine("E-posta adresi geçersiz.");
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(message))
+            {
+                Console.WriteLine("E-posta içeriði boþ olamaz.");
+                return;
+            }
+
+            Console.WriteLine("Gönderen: " + SenderEmail);
+            Console.WriteLine("Alýcý: " + recipient);
+            Console.WriteLine("Konu: " + EmailSubject);
+            Console.WriteLine("Mesaj: " + message);
+
+            Console.WriteLine("E-posta sunucusuna baðlanýlýyor...");
+            Console.WriteLine("E-posta gönderimi simüle edildi.");
+
+            SentEmailCount++;
+
+            Console.WriteLine("Gönderilen E-Posta: " + SentEmailCount);
+        }
+    }
+}
+
+
+
+----------------------------------------------------------------------------------
+
+
+using RestaurantFlow.ConsoleUI.DIPExamples.Interfaces;
+
+namespace RestaurantFlow.ConsoleUI.DIPExamples.Services
+{
+    public class OrderManager
+    {
+        private readonly INotificationService _notificationService;
+
+        public int TotalOrders { get; private set; }
+        public decimal TotalSales { get; private set; }
+
+        public OrderManager(INotificationService notificationService)
+        {
+            _notificationService = notificationService
+                ?? throw new ArgumentNullException(nameof(notificationService));
+        }
+
+        public void CreateOrder(
+            int orderId,
+            string customerName,
+            string recipient,
+            string productName,
+            int quantity,
+            decimal unitPrice)
+        {
+            Console.WriteLine("===== YENÝ SÝPARÝÞ =====");
+
+            if (orderId <= 0 ||
+                string.IsNullOrWhiteSpace(customerName) ||
+                string.IsNullOrWhiteSpace(recipient) ||
+                string.IsNullOrWhiteSpace(productName) ||
+                quantity <= 0 ||
+                unitPrice <= 0)
+            {
+                Console.WriteLine("Sipariþ bilgileri geçersiz.");
+                return;
+            }
+
+            decimal totalAmount = quantity * unitPrice;
+
+            TotalOrders++;
+            TotalSales += totalAmount;
+
+            Console.WriteLine("Sipariþ No: " + orderId);
+            Console.WriteLine("Müþteri: " + customerName);
+            Console.WriteLine("Ürün: " + productName);
+            Console.WriteLine("Miktar: " + quantity);
+            Console.WriteLine("Birim Fiyat: " + unitPrice + " TL");
+            Console.WriteLine("Toplam Tutar: " + totalAmount + " TL");
+            Console.WriteLine("Sipariþ baþarýyla oluþturuldu.");
+
+            Console.WriteLine();
+
+            string message =
+                $"Sayýn {customerName}, " +
+                $"{orderId} numaralý sipariþiniz alýndý. " +
+                $"Toplam tutar: {totalAmount} TL.";
+
+            _notificationService.SendNotification(recipient, message);
+        }
+
+        public void ShowOrderSummary()
+        {
+            Console.WriteLine("===== SÝPARÝÞ ÖZETÝ =====");
+            Console.WriteLine("Toplam Sipariþ: " + TotalOrders);
+            Console.WriteLine("Toplam Satýþ: " + TotalSales + " TL");
+        }
+    }
+}
+
+
+----------------------------------------------------------------------------------
+
+
+using RestaurantFlow.ConsoleUI.DIPExamples.Services;
+
+SmsService smsService = new SmsService();
+
+OrderManager orderManager = new OrderManager(smsService);
+
+orderManager.CreateOrder(
+    1001,
+    "Ahmet Yýlmaz",
+    "05551234567",
+    "Hamburger Menü",
+    2,
+    350);
+
+Console.WriteLine();
+
+orderManager.ShowOrderSummary();
+
+Console.ReadLine();
+
+
+
+----------------------------------------------------------------------------------
+
+using RestaurantFlow.ConsoleUI.DIPExamples.Services;
+
+EmailService emailService = new EmailService();
+
+emailService.SenderEmail = "siparis@restaurantflow.com";
+emailService.EmailSubject = "Sipariþiniz Alýndý";
+
+OrderManager orderManager = new OrderManager(emailService);
+
+orderManager.CreateOrder(
+    1002,
+    "Zeynep Demir",
+    "zeynep@example.com",
+    "Pizza Menü",
+    3,
+    400);
+
+Console.WriteLine();
+
+orderManager.ShowOrderSummary();
+
+Console.ReadLine();
+
+
+----------------------------------------------------------------------------------
+----------------------------------------------------------------------------------
+----------------------------------------------------------------------------------
+----------------------------------------------------------------------------------

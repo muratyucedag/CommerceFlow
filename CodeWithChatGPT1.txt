@@ -1,0 +1,450 @@
+Console.WriteLine("========================================");
+Console.WriteLine("       COMMERCEFLOW E-COMMERCE");
+Console.WriteLine("========================================");
+Console.WriteLine();
+Console.WriteLine("1 - Ürünleri Listele");
+Console.WriteLine("2 - Ürün Ara");
+Console.WriteLine("3 - Sepetim");
+Console.WriteLine("4 - Sipariþlerim");
+Console.WriteLine("5 - Çýkýþ");
+Console.WriteLine();
+Console.WriteLine("----------------------------------------");
+Console.Write("Lütfen yapmak istediðiniz iþlemi seçiniz: ");
+
+string? secim = Console.ReadLine();
+
+------------------------------------------------------------------------------
+
+Console.WriteLine("========================================");
+Console.WriteLine("       COMMERCEFLOW E-COMMERCE");
+Console.WriteLine("========================================");
+Console.WriteLine();
+Console.WriteLine("1  - Ürünleri Listele");
+Console.WriteLine("2  - Kategorileri Listele");
+Console.WriteLine("3  - Ürün Ara");
+Console.WriteLine("4  - Ürün Detaylarýný Görüntüle");
+Console.WriteLine("5  - Sepete Ürün Ekle");
+Console.WriteLine("6  - Sepetim");
+Console.WriteLine("7  - Sepetten Ürün Çýkar");
+Console.WriteLine("8  - Ýndirimler ve Kampanyalar");
+Console.WriteLine("9  - Favorilerim");
+Console.WriteLine("10 - Sipariþ Oluþtur");
+Console.WriteLine("11 - Sipariþlerim");
+Console.WriteLine("12 - Sipariþ Detaylarýný Görüntüle");
+Console.WriteLine("13 - Sipariþ Ýptal Et");
+Console.WriteLine("14 - Ödeme Yöntemleri");
+Console.WriteLine("15 - Adreslerim");
+Console.WriteLine("16 - Profil Bilgilerim");
+Console.WriteLine("17 - Çýkýþ");
+Console.WriteLine();
+Console.WriteLine("----------------------------------------");
+Console.Write("Lütfen yapmak istediðiniz iþlemi seçiniz: ");
+
+string? secim = Console.ReadLine();
+
+
+------------------------------------------------------------------------------
+
+ public int Id { get; set; }
+        public string Name { get; set; } = "";
+        public string Description { get; set; } = "";
+        public decimal Price { get; set; }
+        public int StockQuantity { get; set; }
+        public string ProductCode { get; set; } = "";
+        public int CategoryId { get; set; }
+        public bool IsActive { get; set; }
+
+
+------------------------------------------------------------------------------
+
+  public int Id { get; set; }
+        public string FirstName { get; set; } = "";
+        public string LastName { get; set; } = "";
+        public string Email { get; set; } = "";
+        public string PhoneNumber { get; set; } = "";
+        public DateTime RegistrationDate { get; set; }
+        public bool IsActive { get; set; }
+
+
+------------------------------------------------------------------------------
+
+namespace CommerceFlow.ConsoleUI.Helpers
+{
+    public class ConsoleDesign
+    {
+        public void ShowBanner()
+        {
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("==================================================");
+            Console.WriteLine("             COMMERCEFLOW E-COMMERCE              ");
+            Console.WriteLine("==================================================");
+            Console.ResetColor();
+            Console.WriteLine("          E-Ticaret Yönetim Simülasyonu           ");
+            Console.WriteLine();
+        }
+    }
+}
+
+
+------------------------------------------------------------------------------
+
+public void ShowSectionHeader(string title)
+{
+    Console.ForegroundColor = ConsoleColor.Yellow;
+
+    Console.WriteLine();
+    Console.WriteLine("========================================");
+    Console.WriteLine($"              {title}");
+    Console.WriteLine("========================================");
+
+    Console.ResetColor();
+    Console.WriteLine();
+}
+
+
+------------------------------------------------------------------------------
+
+
+namespace CommerceFlow.ConsoleUI.Examples
+{
+    public class BankAccountManagement
+    {
+        private decimal _balance;
+        private bool _isActive;
+
+        public string AccountOwner { get; private set; }
+
+        public decimal Balance
+        {
+            get { return _balance; }
+        }
+
+        public bool IsActive
+        {
+            get { return _isActive; }
+        }
+
+        public BankAccountManagement(string accountOwner, decimal balance)
+        {
+            if (string.IsNullOrWhiteSpace(accountOwner))
+                throw new ArgumentException("Hesap sahibi boþ olamaz.");
+
+            if (balance < 0)
+                throw new ArgumentException("Baþlangýç bakiyesi negatif olamaz.");
+
+            AccountOwner = accountOwner;
+            _balance = balance;
+            _isActive = true;
+        }
+
+        public void Deposit(decimal amount)
+        {
+            if (!_isActive)
+            {
+                Console.WriteLine("Hesap kapalý. Ýþlem yapýlamaz.");
+                return;
+            }
+
+            if (amount <= 0)
+            {
+                Console.WriteLine("Yatýrýlacak tutar sýfýrdan büyük olmalýdýr.");
+                return;
+            }
+
+            _balance += amount;
+
+            Console.WriteLine($"Para yatýrýldý. Güncel bakiye: {_balance} TL");
+        }
+
+        public void Withdraw(decimal amount)
+        {
+            if (!_isActive)
+            {
+                Console.WriteLine("Hesap kapalý. Ýþlem yapýlamaz.");
+                return;
+            }
+
+            if (amount <= 0)
+            {
+                Console.WriteLine("Çekilecek tutar sýfýrdan büyük olmalýdýr.");
+                return;
+            }
+
+            if (amount > _balance)
+            {
+                Console.WriteLine("Yetersiz bakiye.");
+                return;
+            }
+
+            _balance -= amount;
+
+            Console.WriteLine($"Para çekildi. Güncel bakiye: {_balance} TL");
+        }
+
+        public void CloseAccount()
+        {
+            _isActive = false;
+            Console.WriteLine("Banka hesabý kapatýldý.");
+        }
+
+        public void ShowAccountInformation()
+        {
+            Console.WriteLine($"Hesap Sahibi: {AccountOwner}");
+            Console.WriteLine($"Bakiye: {_balance} TL");
+            Console.WriteLine($"Hesap Durumu: {(_isActive ? "Aktif" : "Pasif")}");
+        }
+    }
+}
+
+
+
+------------------------------------------------------------------------------
+
+using CommerceFlow.ConsoleUI.Examples;
+
+BankAccountManagement account =
+    new BankAccountManagement("Ahmet Yýlmaz", 25000);
+
+account.ShowAccountInformation();
+
+Console.WriteLine("--------------------------");
+
+account.Deposit(5000);
+account.Withdraw(10000);
+account.Withdraw(30000);
+
+Console.WriteLine("--------------------------");
+
+account.CloseAccount();
+
+account.Deposit(1000);
+
+Console.WriteLine("--------------------------");
+
+account.ShowAccountInformation();
+
+Console.ReadLine();
+
+
+------------------------------------------------------------------------------
+
+namespace CommerceFlow.ConsoleUI.InheritanceExamples
+{
+    public class Vehicle
+    {
+        public string Brand { get; set; } = "";
+        public string Model { get; set; } = "";
+        public int ProductionYear { get; set; }
+        public string PlateNumber { get; set; } = "";
+        public int CurrentSpeed { get; private set; }
+
+        public void Start()
+        {
+            Console.WriteLine($"{Brand} {Model} çalýþtýrýldý.");
+        }
+
+        public void Accelerate(int amount)
+        {
+            if (amount <= 0)
+            {
+                Console.WriteLine("Hýz artýþý pozitif olmalýdýr.");
+                return;
+            }
+
+            CurrentSpeed += amount;
+
+            Console.WriteLine($"Güncel hýz: {CurrentSpeed} km/sa");
+        }
+
+        public void Brake(int amount)
+        {
+            if (amount <= 0)
+            {
+                Console.WriteLine("Fren miktarý pozitif olmalýdýr.");
+                return;
+            }
+
+            CurrentSpeed = Math.Max(0, CurrentSpeed - amount);
+
+            Console.WriteLine($"Fren yapýldý. Güncel hýz: {CurrentSpeed} km/sa");
+        }
+
+        public void Stop()
+        {
+            CurrentSpeed = 0;
+            Console.WriteLine("Araç durduruldu.");
+        }
+
+        public void ShowVehicleInformation()
+        {
+            Console.WriteLine($"Marka: {Brand}");
+            Console.WriteLine($"Model: {Model}");
+            Console.WriteLine($"Üretim Yýlý: {ProductionYear}");
+            Console.WriteLine($"Plaka: {PlateNumber}");
+        }
+    }
+}
+
+
+------------------------------------------------------------------------------
+
+namespace CommerceFlow.ConsoleUI.InheritanceExamples
+{
+    public class Car : Vehicle
+    {
+        public int DoorCount { get; set; }
+        public int TrunkCapacity { get; set; }
+        public bool HasSunroof { get; set; }
+
+        public void OpenTrunk()
+        {
+            Console.WriteLine($"{Brand} {Model} bagajý açýldý.");
+        }
+
+        public void ActivateAirConditioner()
+        {
+            Console.WriteLine("Klima çalýþtýrýldý.");
+        }
+
+        public void ShowCarInformation()
+        {
+            ShowVehicleInformation();
+
+            Console.WriteLine($"Kapý Sayýsý: {DoorCount}");
+            Console.WriteLine($"Bagaj Hacmi: {TrunkCapacity} litre");
+            Console.WriteLine($"Sunroof: {(HasSunroof ? "Var" : "Yok")}");
+        }
+    }
+}
+
+
+------------------------------------------------------------------------------
+
+namespace CommerceFlow.ConsoleUI.InheritanceExamples
+{
+    public class Motorcycle : Vehicle
+    {
+        public int EngineCapacity { get; set; }
+        public bool HasSideCase { get; set; }
+
+        public void ActivateHeadlight()
+        {
+            Console.WriteLine("Motosiklet farý açýldý.");
+        }
+
+        public void ShowMotorcycleInformation()
+        {
+            ShowVehicleInformation();
+
+            Console.WriteLine($"Motor Hacmi: {EngineCapacity} cc");
+            Console.WriteLine($"Yan Çanta: {(HasSideCase ? "Var" : "Yok")}");
+        }
+    }
+}
+------------------------------------------------------------------------------
+
+namespace CommerceFlow.ConsoleUI.InheritanceExamples
+{
+    public class Truck : Vehicle
+    {
+        public decimal LoadCapacity { get; set; }
+        public decimal CurrentLoad { get; private set; }
+
+        public void LoadCargo(decimal weight)
+        {
+            if (weight <= 0)
+            {
+                Console.WriteLine("Yük aðýrlýðý pozitif olmalýdýr.");
+                return;
+            }
+
+            if (CurrentLoad + weight > LoadCapacity)
+            {
+                Console.WriteLine("Yük kapasitesi aþýlýyor!");
+                return;
+            }
+
+            CurrentLoad += weight;
+
+            Console.WriteLine($"Yükleme tamamlandý. Mevcut yük: {CurrentLoad} ton");
+        }
+
+        public void ShowTruckInformation()
+        {
+            ShowVehicleInformation();
+
+            Console.WriteLine($"Yük Kapasitesi: {LoadCapacity} ton");
+            Console.WriteLine($"Mevcut Yük: {CurrentLoad} ton");
+        }
+    }
+}
+
+
+------------------------------------------------------------------------------
+
+using CommerceFlow.ConsoleUI.InheritanceExamples;
+
+Car car = new Car();
+
+car.Brand = "Volkswagen";
+car.Model = "Golf";
+car.ProductionYear = 2024;
+car.PlateNumber = "34 ABC 123";
+car.DoorCount = 5;
+car.TrunkCapacity = 380;
+car.HasSunroof = true;
+
+car.ShowCarInformation();
+
+Console.WriteLine("-------------------------");
+
+car.Start();
+car.Accelerate(50);
+car.Accelerate(30);
+car.Brake(20);
+car.Stop();
+
+Console.WriteLine("-------------------------");
+
+car.OpenTrunk();
+car.ActivateAirConditioner();
+
+
+------------------------------------------------------------------------------
+
+using CommerceFlow.ConsoleUI.InheritanceExamples;
+
+Motorcycle motorcycle = new Motorcycle();
+
+motorcycle.Brand = "Honda";
+motorcycle.Model = "CBR 650R";
+motorcycle.ProductionYear = 2025;
+motorcycle.PlateNumber = "34 MTR 650";
+
+motorcycle.EngineCapacity = 649;
+motorcycle.HasSideCase = false;
+
+Console.WriteLine("===== MOTOSÝKLET BÝLGÝLERÝ =====");
+
+motorcycle.ShowMotorcycleInformation();
+
+Console.WriteLine();
+
+Console.WriteLine("===== SÜRÜÞ SÝMÜLASYONU =====");
+
+motorcycle.Start();
+motorcycle.ActivateHeadlight();
+motorcycle.Accelerate(40);
+motorcycle.Accelerate(50);
+motorcycle.Brake(30);
+motorcycle.Stop();
+
+Console.ReadLine();
+
+
+------------------------------------------------------------------------------
+
+
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------

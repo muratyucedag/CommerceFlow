@@ -1,0 +1,170 @@
+
+namespace CommerceFlow.ConsoleUI.HotelRoomExamples
+{
+    public abstract class Room
+    {
+        public int RoomNumber { get; set; }
+        public int FloorNumber { get; set; }
+        public decimal PricePerNight { get; set; }
+        public int Capacity { get; set; }
+        public bool IsAvailable { get; set; } = true;
+
+        public void ShowRoomInformation()
+        {
+            Console.WriteLine("Oda No: " + RoomNumber);
+            Console.WriteLine("Kat: " + FloorNumber);
+            Console.WriteLine("Gecelik Fiyat: " + PricePerNight);
+            Console.WriteLine("Kapasite: " + Capacity);
+
+            Console.WriteLine(
+                "Durum: " + (IsAvailable ? "Müsait" : "Dolu"));
+        }
+
+        public void ReserveRoom()
+        {
+            if (IsAvailable)
+            {
+                IsAvailable = false;
+                Console.WriteLine("Oda rezervasyonu oluþturuldu.");
+            }
+            else
+            {
+                Console.WriteLine("Oda müsait deðil.");
+            }
+        }
+    }
+}
+
+------------------------------------------------------------------------------
+
+
+namespace CommerceFlow.ConsoleUI.HotelRoomExamples
+{
+    public class StandardRoom : Room
+    {
+        public bool HasTelevision { get; set; }
+        public bool HasMiniBar { get; set; }
+
+        public void ShowStandardRoomFeatures()
+        {
+            Console.WriteLine("Oda Türü: Standard Room");
+            Console.WriteLine("Televizyon: " + HasTelevision);
+            Console.WriteLine("Mini Bar: " + HasMiniBar);
+        }
+    }
+}
+
+
+
+------------------------------------------------------------------------------
+
+using CommerceFlow.ConsoleUI.HotelRoomExamples;
+
+StandardRoom room = new StandardRoom();
+
+room.RoomNumber = 305;
+room.FloorNumber = 3;
+room.PricePerNight = 3500;
+room.Capacity = 2;
+
+room.HasTelevision = true;
+room.HasMiniBar = false;
+
+Console.WriteLine("=== ODA BÝLGÝLERÝ ===");
+
+room.ShowRoomInformation();
+room.ShowStandardRoomFeatures();
+
+Console.WriteLine();
+
+Console.WriteLine("=== REZERVASYON ===");
+
+room.ReserveRoom();
+
+Console.WriteLine();
+
+room.ShowRoomInformation();
+
+Console.ReadLine();
+
+
+------------------------------------------------------------------------------
+
+
+namespace CommerceFlow.ConsoleUI.HotelRoomExamples
+{
+    public class DeluxeRoom : Room
+    {
+        // Deluxe odaya özgü özellikler
+        public bool HasBalcony { get; set; }
+        public bool HasJacuzzi { get; set; }
+        public bool HasSeaView { get; set; }
+        public int RoomSize { get; set; }
+
+        // Deluxe oda özelliklerini görüntüleme
+        public void ShowDeluxeFeatures()
+        {
+            Console.WriteLine("Oda Türü: Deluxe Room");
+            Console.WriteLine("Balkon: " + HasBalcony);
+            Console.WriteLine("Jakuzi: " + HasJacuzzi);
+            Console.WriteLine("Deniz Manzarasý: " + HasSeaView);
+            Console.WriteLine("Oda Büyüklüðü: " + RoomSize + " m²");
+        }
+
+        // Deluxe odaya özel hizmet
+        public void RequestRoomService()
+        {
+            Console.WriteLine("Deluxe oda için oda servisi talebi oluþturuldu.");
+        }
+    }
+}
+
+
+
+------------------------------------------------------------------------------
+
+
+using CommerceFlow.ConsoleUI.HotelRoomExamples;
+
+DeluxeRoom deluxeRoom = new DeluxeRoom();
+
+// Room sýnýfýndan gelen özellikler
+deluxeRoom.RoomNumber = 405;
+deluxeRoom.FloorNumber = 4;
+deluxeRoom.PricePerNight = 8500;
+deluxeRoom.Capacity = 3;
+
+// DeluxeRoom sýnýfýna özgü özellikler
+deluxeRoom.HasBalcony = true;
+deluxeRoom.HasJacuzzi = true;
+deluxeRoom.HasSeaView = true;
+deluxeRoom.RoomSize = 55;
+
+Console.WriteLine("=== DELUXE ODA BÝLGÝLERÝ ===");
+
+deluxeRoom.ShowRoomInformation();
+deluxeRoom.ShowDeluxeFeatures();
+
+Console.WriteLine();
+
+Console.WriteLine("=== ODA HÝZMETLERÝ ===");
+
+deluxeRoom.RequestRoomService();
+
+Console.WriteLine();
+
+Console.WriteLine("=== REZERVASYON ÝÞLEMÝ ===");
+
+deluxeRoom.ReserveRoom();
+
+Console.WriteLine();
+
+deluxeRoom.ShowRoomInformation();
+
+Console.ReadLine();
+
+
+
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------

@@ -1,0 +1,415 @@
+namespace CommerceFlow.ConsoleUI.HotelExamples
+{
+    public class HotelEmployee
+    {
+        // PUBLIC - Genel personel bilgileri
+        public int EmployeeId { get; set; }
+        public string FullName { get; set; } = "";
+        public string Department { get; set; } = "";
+        public string Position { get; set; } = "";
+        public DateTime HireDate { get; set; }
+        public bool IsActive { get; set; } = true;
+
+
+        // PRIVATE - Maaþ bilgileri
+        private decimal Salary = 45000;
+        private decimal Bonus = 0;
+
+
+        // PROTECTED - Personel çalýþma ve konaklama bilgileri
+        protected string StaffRoom = "P-205";
+        protected string StaffCorridor = "B Blok - Personel Katý";
+        protected string Shift = "08:00 - 16:00";
+        protected int WeeklyWorkingHours = 45;
+        protected int AnnualLeaveDays = 14;
+
+
+        // PUBLIC METHODS
+        public void ShowEmployeeInformation()
+        {
+            Console.WriteLine("Personel No: " + EmployeeId);
+            Console.WriteLine("Ad Soyad: " + FullName);
+            Console.WriteLine("Departman: " + Department);
+            Console.WriteLine("Pozisyon: " + Position);
+            Console.WriteLine("Ýþe Giriþ Tarihi: " + HireDate.ToShortDateString());
+            Console.WriteLine("Durum: " + (IsActive ? "Aktif" : "Pasif"));
+        }
+
+        public void ShowSalaryInformation()
+        {
+            Console.WriteLine("Maaþ: " + Salary + " TL");
+            Console.WriteLine("Prim: " + Bonus + " TL");
+            Console.WriteLine("Toplam: " + (Salary + Bonus) + " TL");
+        }
+
+        public void IncreaseSalary(decimal amount)
+        {
+            if (amount > 0)
+            {
+                Salary += amount;
+                Console.WriteLine("Maaþ artýþý gerçekleþtirildi.");
+            }
+        }
+
+        public void AddBonus(decimal amount)
+        {
+            if (amount > 0)
+            {
+                Bonus += amount;
+                Console.WriteLine("Personel primi eklendi.");
+            }
+        }
+
+
+        // PROTECTED METHODS
+        protected void ShowAccommodationInformation()
+        {
+            Console.WriteLine("Personel Odasý: " + StaffRoom);
+            Console.WriteLine("Personel Koridoru: " + StaffCorridor);
+        }
+
+        protected void ShowWorkingInformation()
+        {
+            Console.WriteLine("Vardiya: " + Shift);
+            Console.WriteLine("Haftalýk Çalýþma: " + WeeklyWorkingHours + " saat");
+            Console.WriteLine("Yýllýk Ýzin: " + AnnualLeaveDays + " gün");
+        }
+    }
+}
+
+------------------------------------------------------------------------------------------------
+
+namespace CommerceFlow.ConsoleUI.HotelExamples
+{
+    public class Chef : HotelEmployee
+    {
+        // Aþçýya özgü özellikler
+        public string Specialty { get; set; } = "";
+        public string KitchenSection { get; set; } = "";
+        public int ExperienceYears { get; set; }
+        public bool HasHygieneCertificate { get; set; }
+
+        // Aþçýnýn görevini gerçekleþtirmesi
+        public void PrepareMeal(string mealName)
+        {
+            Console.WriteLine($"{FullName} tarafýndan {mealName} hazýrlandý.");
+        }
+
+        // Protected üyelere eriþim
+        public void AssignStaffRoom(string roomNumber)
+        {
+            StaffRoom = roomNumber;
+            Console.WriteLine("Personel odasý tahsis edildi.");
+        }
+
+        public void ChangeShift(string newShift)
+        {
+            Shift = newShift;
+            Console.WriteLine("Aþçýnýn vardiyasý güncellendi.");
+        }
+
+        // Aþçý bilgilerini görüntüleme
+        public void ShowChefInformation()
+        {
+            ShowEmployeeInformation();
+
+            Console.WriteLine($"Uzmanlýk: {Specialty}");
+            Console.WriteLine($"Mutfak Bölümü: {KitchenSection}");
+            Console.WriteLine($"Deneyim: {ExperienceYears} yýl");
+            Console.WriteLine($"Hijyen Sertifikasý: {HasHygieneCertificate}");
+
+            ShowAccommodationInformation();
+            ShowWorkingInformation();
+        }
+    }
+}
+
+
+------------------------------------------------------------------------------------------------
+
+using CommerceFlow.ConsoleUI.HotelExamples;
+
+Chef chef = new Chef();
+
+chef.EmployeeId = 101;
+chef.FullName = "Mehmet Yýlmaz";
+chef.Department = "Mutfak";
+chef.Position = "Executive Chef";
+chef.HireDate = new DateTime(2022, 5, 15);
+
+chef.Specialty = "Ýtalyan Mutfaðý";
+chef.KitchenSection = "Sýcak Mutfak";
+chef.ExperienceYears = 12;
+chef.HasHygieneCertificate = true;
+
+chef.AssignStaffRoom("P-310");
+chef.ChangeShift("14:00 - 22:00");
+
+Console.WriteLine("===== AÞÇI BÝLGÝLERÝ =====");
+
+chef.ShowChefInformation();
+
+Console.WriteLine();
+
+Console.WriteLine("===== GÖREV ÝÞLEMLERÝ =====");
+
+chef.PrepareMeal("Risotto");
+chef.PrepareMeal("Lazanya");
+
+Console.WriteLine();
+
+Console.WriteLine("===== MAAÞ ÝÞLEMLERÝ =====");
+
+chef.IncreaseSalary(5000);
+chef.AddBonus(2500);
+chef.ShowSalaryInformation();
+
+Console.ReadLine();
+
+
+------------------------------------------------------------------------------------------------
+
+
+namespace CommerceFlow.ConsoleUI.HotelExamples
+{
+    public class HouseKeeper : HotelEmployee
+    {
+        // Kat hizmetlerine özgü özellikler
+        public int AssignedFloor { get; set; }
+        public int DailyRoomTarget { get; set; }
+        public int CleanedRoomCount { get; private set; }
+
+        // Personel odasý tahsisi
+        public void AssignStaffRoom(string roomNumber)
+        {
+            StaffRoom = roomNumber;
+            Console.WriteLine("Personel odasý tahsis edildi.");
+        }
+
+        // Vardiya belirleme
+        public void AssignShift(string newShift)
+        {
+            Shift = newShift;
+            Console.WriteLine("Vardiya güncellendi.");
+        }
+
+        // Oda temizleme iþlemi
+        public void CleanRoom(int roomNumber)
+        {
+            if (roomNumber <= 0)
+            {
+                Console.WriteLine("Geçersiz oda numarasý.");
+                return;
+            }
+
+            CleanedRoomCount++;
+
+            Console.WriteLine(
+                $"{roomNumber} numaralý oda temizlendi.");
+        }
+
+        // Günlük temizlik durumunu görüntüleme
+        public void ShowCleaningStatus()
+        {
+            Console.WriteLine($"Günlük Hedef: {DailyRoomTarget}");
+            Console.WriteLine($"Temizlenen Oda: {CleanedRoomCount}");
+            Console.WriteLine(
+                $"Kalan Oda: {Math.Max(0, DailyRoomTarget - CleanedRoomCount)}");
+        }
+
+        // Personel bilgilerini görüntüleme
+        public void ShowHouseKeeperInformation()
+        {
+            ShowEmployeeInformation();
+
+            Console.WriteLine($"Sorumlu Kat: {AssignedFloor}");
+
+            ShowAccommodationInformation();
+            ShowWorkingInformation();
+        }
+    }
+}
+
+
+
+------------------------------------------------------------------------------------------------
+
+using CommerceFlow.ConsoleUI.HotelExamples;
+
+HouseKeeper houseKeeper = new HouseKeeper();
+
+houseKeeper.EmployeeId = 102;
+houseKeeper.FullName = "Zeynep Demir";
+houseKeeper.Department = "Kat Hizmetleri";
+houseKeeper.Position = "HouseKeeper";
+houseKeeper.HireDate = new DateTime(2023, 4, 10);
+
+houseKeeper.AssignedFloor = 3;
+houseKeeper.DailyRoomTarget = 12;
+
+houseKeeper.AssignStaffRoom("P-214");
+houseKeeper.AssignShift("08:00 - 16:00");
+
+Console.WriteLine("===== PERSONEL BÝLGÝLERÝ =====");
+
+houseKeeper.ShowHouseKeeperInformation();
+
+Console.WriteLine();
+
+Console.WriteLine("===== TEMÝZLÝK ÝÞLEMLERÝ =====");
+
+houseKeeper.CleanRoom(301);
+houseKeeper.CleanRoom(302);
+houseKeeper.CleanRoom(305);
+
+Console.WriteLine();
+
+Console.WriteLine("===== GÜNLÜK GÖREV DURUMU =====");
+
+houseKeeper.ShowCleaningStatus();
+
+Console.ReadLine();
+
+
+------------------------------------------------------------------------------------------------
+
+
+using CommerceFlow.ConsoleUI.HotelExamples;
+
+Chef chef = new Chef();
+chef.EmployeeId = 101;
+chef.FullName = "Ahmet Yýlmaz";
+chef.Department = "Mutfak";
+chef.Position = "Executive Chef";
+chef.Specialty = "Ýtalyan Mutfaðý";
+
+HouseKeeper houseKeeper = new HouseKeeper();
+houseKeeper.EmployeeId = 102;
+houseKeeper.FullName = "Zeynep Demir";
+houseKeeper.Department = "Kat Hizmetleri";
+houseKeeper.Position = "HouseKeeper";
+houseKeeper.AssignedFloor = 3;
+
+HotelEmployee employee = new HotelEmployee();
+employee.EmployeeId = 103;
+employee.FullName = "Mehmet Kaya";
+employee.Department = "Genel Hizmetler";
+employee.Position = "Personel";
+
+// Farklý nesneleri ayný listede tutuyoruz.
+List<HotelEmployee> employees = new List<HotelEmployee>();
+
+employees.Add(chef);
+employees.Add(houseKeeper);
+employees.Add(employee);
+
+Console.WriteLine("=== GRAND PALACE HOTEL ===");
+Console.WriteLine("=== SABAH VARDÝYASI ===");
+
+foreach (var item in employees)
+{
+    Console.WriteLine("--------------------------");
+    Console.WriteLine($"Personel: {item.FullName}");
+
+    item.StartShift();
+    item.PerformDuty();
+}
+
+Console.ReadLine();
+
+
+------------------------------------------------------------------------------------------------
+
+
+namespace CommerceFlow.ConsoleUI.HotelExamples
+{
+    public class SecurityGuard : HotelEmployee
+    {
+        // Güvenlik görevlisine özgü özellikler
+        public string SecurityArea { get; set; } = "";
+        public bool HasSecurityCertificate { get; set; }
+        public int IncidentCount { get; private set; }
+
+        // Görev bölgesi belirleme
+        public void AssignSecurityArea(string area)
+        {
+            SecurityArea = area;
+            Console.WriteLine("Güvenlik bölgesi belirlendi.");
+        }
+
+        // Olay kaydý oluþturma
+        public void ReportIncident(string description)
+        {
+            IncidentCount++;
+
+            Console.WriteLine("Güvenlik olayý kaydedildi.");
+            Console.WriteLine("Olay: " + description);
+            Console.WriteLine("Toplam Olay: " + IncidentCount);
+        }
+
+        // Protected alanýn kullanýmý
+        public void ChangeShift(string newShift)
+        {
+            Shift = newShift;
+            Console.WriteLine("Güvenlik vardiyasý güncellendi.");
+        }
+
+        // Virtual metodun yeniden uygulanmasý
+        public override void StartShift()
+        {
+            Console.WriteLine(
+                $"{FullName} güvenlik vardiyasýný baþlattý.");
+
+            Console.WriteLine("Güvenlik ekipmanlarý kontrol edildi.");
+        }
+
+        // Polymorphism için override
+        public override void PerformDuty()
+        {
+            Console.WriteLine(
+                $"{FullName} güvenlik noktasýna geçti.");
+
+            Console.WriteLine(
+                $"{SecurityArea} bölgesinde devriye baþladý.");
+
+            Console.WriteLine(
+                "Giriþ ve çýkýþ kontrolleri gerçekleþtiriliyor.");
+        }
+
+        // Güvenlik personeli bilgileri
+        public void ShowSecurityInformation()
+        {
+            ShowEmployeeInformation();
+
+            Console.WriteLine("Güvenlik Bölgesi: " + SecurityArea);
+            Console.WriteLine(
+                "Güvenlik Sertifikasý: " + HasSecurityCertificate);
+
+            Console.WriteLine("Olay Sayýsý: " + IncidentCount);
+
+            ShowWorkingInformation();
+        }
+    }
+}
+
+
+
+------------------------------------------------------------------------------------------------
+
+SecurityGuard security = new SecurityGuard();
+
+security.EmployeeId = 104;
+security.FullName = "Murat Demir";
+security.Department = "Güvenlik";
+security.Position = "Security Guard";
+security.HireDate = new DateTime(2024, 3, 12);
+
+security.HasSecurityCertificate = true;
+
+security.AssignSecurityArea("Ana Giriþ ve Lobi");
+security.ChangeShift("16:00 - 00:00");
+
+
+------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------

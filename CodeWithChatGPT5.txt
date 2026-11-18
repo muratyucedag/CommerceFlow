@@ -1,0 +1,385 @@
+
+namespace RestaurantFlow.ConsoleUI.Services
+{
+    public class OrderService
+    {
+        private int _orderId;
+        private string _customerName = "";
+        private string _productName = "";
+        private int _quantity;
+        private decimal _unitPrice;
+        private decimal _totalPrice;
+        private string _orderStatus = "Sipariþ Yok";
+
+        public void CreateOrder(
+            int orderId,
+            string customerName,
+            string productName,
+            int quantity,
+            decimal unitPrice)
+        {
+            if (orderId <= 0 ||
+                string.IsNullOrWhiteSpace(customerName) ||
+                string.IsNullOrWhiteSpace(productName) ||
+                quantity <= 0 ||
+                unitPrice <= 0)
+            {
+                Console.WriteLine("Geçersiz sipariþ bilgileri.");
+                return;
+            }
+
+            if (_orderId != 0)
+            {
+                Console.WriteLine("Önce mevcut sipariþi tamamlayýn.");
+                return;
+            }
+
+            _orderId = orderId;
+            _customerName = customerName;
+            _productName = productName;
+            _quantity = quantity;
+            _unitPrice = unitPrice;
+
+            _totalPrice = _quantity * _unitPrice;
+            _orderStatus = "Hazýrlanýyor";
+
+            Console.WriteLine("Yeni sipariþ oluþturuldu.");
+            Console.WriteLine("Sipariþ No: " + _orderId);
+            Console.WriteLine("Müþteri: " + _customerName);
+            Console.WriteLine("Ürün: " + _productName);
+            Console.WriteLine("Adet: " + _quantity);
+            Console.WriteLine("Toplam: " + _totalPrice + " TL");
+        }
+
+        public decimal CalculateTotalPrice()
+        {
+            return _totalPrice;
+        }
+
+        public void ShowOrderDetails()
+        {
+            if (_orderId == 0)
+            {
+                Console.WriteLine("Henüz sipariþ bulunmuyor.");
+                return;
+            }
+
+            Console.WriteLine("----- SÝPARÝÞ DETAYLARI -----");
+            Console.WriteLine("Sipariþ No: " + _orderId);
+            Console.WriteLine("Müþteri: " + _customerName);
+            Console.WriteLine("Ürün: " + _productName);
+            Console.WriteLine("Miktar: " + _quantity);
+            Console.WriteLine("Birim Fiyat: " + _unitPrice + " TL");
+            Console.WriteLine("Toplam Tutar: " + _totalPrice + " TL");
+            Console.WriteLine("Durum: " + _orderStatus);
+        }
+
+        public void UpdateOrderStatus(string newStatus)
+        {
+            if (_orderId == 0)
+            {
+                Console.WriteLine("Güncellenecek sipariþ bulunamadý.");
+                return;
+            }
+
+            if (_orderStatus == "Ýptal Edildi")
+            {
+                Console.WriteLine("Ýptal edilen sipariþ güncellenemez.");
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(newStatus))
+            {
+                Console.WriteLine("Sipariþ durumu boþ olamaz.");
+                return;
+            }
+
+            _orderStatus = newStatus;
+
+            Console.WriteLine("Sipariþ durumu güncellendi.");
+            Console.WriteLine("Yeni Durum: " + _orderStatus);
+        }
+
+        public void CancelOrder()
+        {
+            if (_orderId == 0)
+            {
+                Console.WriteLine("Ýptal edilecek sipariþ bulunamadý.");
+                return;
+            }
+
+            if (_orderStatus == "Teslim Edildi")
+            {
+                Console.WriteLine("Teslim edilen sipariþ iptal edilemez.");
+                return;
+            }
+
+            if (_orderStatus == "Ýptal Edildi")
+            {
+                Console.WriteLine("Sipariþ zaten iptal edilmiþ.");
+                return;
+            }
+
+            _orderStatus = "Ýptal Edildi";
+
+            Console.WriteLine("Sipariþ baþarýyla iptal edildi.");
+            Console.WriteLine("Sipariþ No: " + _orderId);
+        }
+    }
+}
+
+
+------------------------------------------------------------------------------------------------------------
+
+
+namespace RestaurantFlow.ConsoleUI.Services
+{
+    public class PaymentService
+    {
+        private decimal _lastPaymentAmount;
+        private string _paymentMethod = "";
+        private bool _isPaymentCompleted;
+
+        public decimal CalculateDiscount(
+            decimal amount,
+            decimal discountRate)
+        {
+            if (amount <= 0 ||
+                discountRate < 0 ||
+                discountRate > 100)
+            {
+                Console.WriteLine("Geçersiz indirim bilgileri.");
+                return 0;
+            }
+
+            decimal discountAmount =
+                amount * discountRate / 100;
+
+            Console.WriteLine("Ýndirim Oraný: %" + discountRate);
+            Console.WriteLine("Ýndirim Tutarý: " +
+                              discountAmount + " TL");
+
+            return amount - discountAmount;
+        }
+
+        public void ProcessPayment(
+            decimal amount,
+            string paymentMethod)
+        {
+            if (amount <= 0)
+            {
+                Console.WriteLine("Ödeme tutarý sýfýrdan büyük olmalýdýr.");
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(paymentMethod))
+            {
+                Console.WriteLine("Ödeme yöntemi seçilmelidir.");
+                return;
+            }
+
+            _lastPaymentAmount = amount;
+            _paymentMethod = paymentMethod;
+            _isPaymentCompleted = true;
+
+            Console.WriteLine("Ödeme iþlemi baþlatýldý.");
+            Console.WriteLine("Ödeme Yöntemi: " + _paymentMethod);
+            Console.WriteLine("Ödenecek Tutar: " + amount + " TL");
+            Console.WriteLine("Ödeme baþarýyla tamamlandý.");
+        }
+
+        public void ShowPaymentInformation()
+        {
+            Console.WriteLine("----- ÖDEME BÝLGÝLERÝ -----");
+
+            if (!_isPaymentCompleted)
+            {
+                Console.WriteLine("Tamamlanan ödeme bulunmuyor.");
+                return;
+            }
+
+            Console.WriteLine("Ödeme Yöntemi: " + _paymentMethod);
+            Console.WriteLine("Ödenen Tutar: " +
+                              _lastPaymentAmount + " TL");
+
+            Console.WriteLine("Durum: Ödeme Tamamlandý");
+        }
+
+        public void RefundPayment()
+        {
+            if (!_isPaymentCompleted)
+            {
+                Console.WriteLine("Ýade edilecek ödeme bulunamadý.");
+                return;
+            }
+
+            Console.WriteLine("Ýade iþlemi baþlatýldý.");
+            Console.WriteLine("Ýade Tutarý: " +
+                              _lastPaymentAmount + " TL");
+
+            _isPaymentCompleted = false;
+
+            Console.WriteLine("Ödeme iadesi tamamlandý.");
+        }
+    }
+}
+
+
+
+------------------------------------------------------------------------------------------------------------
+
+
+namespace RestaurantFlow.ConsoleUI.Services
+{
+    public class NotificationService
+    {
+        public void SendSms(
+            string phoneNumber,
+            string message)
+        {
+            if (string.IsNullOrWhiteSpace(phoneNumber) ||
+                string.IsNullOrWhiteSpace(message))
+            {
+                Console.WriteLine("SMS bilgileri eksik.");
+                return;
+            }
+
+            Console.WriteLine("----- SMS BÝLDÝRÝMÝ -----");
+            Console.WriteLine("Telefon: " + phoneNumber);
+            Console.WriteLine("Mesaj: " + message);
+            Console.WriteLine("SMS bildirimi oluþturuldu.");
+        }
+
+        public void SendEmail(
+            string emailAddress,
+            string subject,
+            string message)
+        {
+            if (string.IsNullOrWhiteSpace(emailAddress) ||
+                string.IsNullOrWhiteSpace(subject) ||
+                string.IsNullOrWhiteSpace(message))
+            {
+                Console.WriteLine("E-posta bilgileri eksik.");
+                return;
+            }
+
+            Console.WriteLine("----- E-POSTA BÝLDÝRÝMÝ -----");
+            Console.WriteLine("Alýcý: " + emailAddress);
+            Console.WriteLine("Konu: " + subject);
+            Console.WriteLine("Ýçerik: " + message);
+            Console.WriteLine("E-posta bildirimi oluþturuldu.");
+        }
+
+        public void SendOrderStatusNotification(
+            string customerName,
+            int orderId,
+            string orderStatus)
+        {
+            Console.WriteLine("----- SÝPARÝÞ BÝLDÝRÝMÝ -----");
+
+            Console.WriteLine("Sayýn " + customerName + ",");
+            Console.WriteLine(orderId +
+                              " numaralý sipariþinizin durumu güncellendi.");
+
+            Console.WriteLine("Yeni Durum: " + orderStatus);
+            Console.WriteLine("Sipariþ bildirimi hazýrlandý.");
+        }
+
+        public void SendPaymentNotification(
+            string customerName,
+            decimal amount)
+        {
+            Console.WriteLine("----- ÖDEME BÝLDÝRÝMÝ -----");
+
+            Console.WriteLine("Sayýn " + customerName + ",");
+            Console.WriteLine(amount +
+                              " TL tutarýndaki ödemeniz tamamlandý.");
+
+            Console.WriteLine("RestaurantFlow'u tercih ettiðiniz için teþekkür ederiz.");
+        }
+    }
+}
+
+
+------------------------------------------------------------------------------------------------------------
+
+
+using RestaurantFlow.ConsoleUI.Services;
+
+OrderService orderService = new OrderService();
+PaymentService paymentService = new PaymentService();
+NotificationService notificationService = new NotificationService();
+
+string customerName = "Ahmet Yýlmaz";
+string phoneNumber = "05551234567";
+string emailAddress = "ahmet@example.com";
+
+Console.WriteLine("=== RESTAURANTFLOW ===");
+Console.WriteLine("=== SÝPARÝÞ OLUÞTURMA ===");
+
+orderService.CreateOrder(
+    1001,
+    customerName,
+    "Hamburger Menü",
+    2,
+    350);
+
+Console.WriteLine();
+
+orderService.ShowOrderDetails();
+
+Console.WriteLine();
+
+Console.WriteLine("=== SÝPARÝÞ DURUMU ===");
+
+orderService.UpdateOrderStatus("Hazýrlandý");
+
+notificationService.SendOrderStatusNotification(
+    customerName,
+    1001,
+    "Hazýrlandý");
+
+Console.WriteLine();
+
+Console.WriteLine("=== ÖDEME ÝÞLEMLERÝ ===");
+
+decimal totalPrice = orderService.CalculateTotalPrice();
+
+decimal discountedPrice =
+    paymentService.CalculateDiscount(totalPrice, 10);
+
+paymentService.ProcessPayment(
+    discountedPrice,
+    "Kredi Kartý");
+
+Console.WriteLine();
+
+paymentService.ShowPaymentInformation();
+
+Console.WriteLine();
+
+Console.WriteLine("=== MÜÞTERÝ BÝLDÝRÝMLERÝ ===");
+
+notificationService.SendSms(
+    phoneNumber,
+    "Sipariþiniz hazýrlanmýþtýr.");
+
+notificationService.SendEmail(
+    emailAddress,
+    "RestaurantFlow Sipariþ Bilgilendirmesi",
+    "Sipariþiniz hazýrlanmýþ ve ödemeniz alýnmýþtýr.");
+
+notificationService.SendPaymentNotification(
+    customerName,
+    discountedPrice);
+
+Console.ReadLine();
+
+
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------

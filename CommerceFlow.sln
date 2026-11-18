@@ -1,0 +1,72 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36511.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommerceFlow.ConsoleUI", "CommerceFlow.ConsoleUI\CommerceFlow.ConsoleUI.csproj", "{90A05A85-2EDE-4731-9800-1DD3A900A1E7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Requirements", "Requirements", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+	ProjectSection(SolutionItems) = preProject
+		CodeWithChatCPT9.txt = CodeWithChatCPT9.txt
+		CodeWithChatGPT1.txt = CodeWithChatGPT1.txt
+		CodeWithChatGPT2.txt = CodeWithChatGPT2.txt
+		CodeWithChatGPT3.txt = CodeWithChatGPT3.txt
+		CodeWithChatGPT4.txt = CodeWithChatGPT4.txt
+		CodeWithChatGPT5.txt = CodeWithChatGPT5.txt
+		CodeWithChatGPT6.txt = CodeWithChatGPT6.txt
+		CodeWithChatGPT7.txt = CodeWithChatGPT7.txt
+		CodeWithChatGPT8.txt = CodeWithChatGPT8.txt
+		CodeWithChatGPT9.txt = CodeWithChatGPT9.txt
+		FinalConsoleCodes.txt = FinalConsoleCodes.txt
+		LaterWillUse.txt = LaterWillUse.txt
+		SQLQueryExamples.txt = SQLQueryExamples.txt
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogisticsApp.ConsoleUI", "LogisticsApp.ConsoleUI\LogisticsApp.ConsoleUI.csproj", "{781F3FEB-ED50-454C-8CA1-7CA525DF6C58}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RestaurantFlow.ConsoleUI", "RestaurantFlow.ConsoleUI\RestaurantFlow.ConsoleUI.csproj", "{950116C5-9320-496C-9B86-7282F11CB332}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommerceFlow.Entities", "CommerceFlow.Entities\CommerceFlow.Entities.csproj", "{E726961C-9BF7-4863-AF3E-38CC549389C2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommerceFlow.DataAccess", "CommerceFlow.DataAccess\CommerceFlow.DataAccess.csproj", "{93ACB6AD-6DAB-4F85-85BD-192B7F5F84BC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommerceFlow.Business", "CommerceFlow.Business\CommerceFlow.Business.csproj", "{94C6B942-F3A5-442E-ADA1-62FAFF032E45}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{90A05A85-2EDE-4731-9800-1DD3A900A1E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{90A05A85-2EDE-4731-9800-1DD3A900A1E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{90A05A85-2EDE-4731-9800-1DD3A900A1E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{90A05A85-2EDE-4731-9800-1DD3A900A1E7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{781F3FEB-ED50-454C-8CA1-7CA525DF6C58}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{781F3FEB-ED50-454C-8CA1-7CA525DF6C58}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{781F3FEB-ED50-454C-8CA1-7CA525DF6C58}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{781F3FEB-ED50-454C-8CA1-7CA525DF6C58}.Release|Any CPU.Build.0 = Release|Any CPU
+		{950116C5-9320-496C-9B86-7282F11CB332}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{950116C5-9320-496C-9B86-7282F11CB332}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{950116C5-9320-496C-9B86-7282F11CB332}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{950116C5-9320-496C-9B86-7282F11CB332}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E726961C-9BF7-4863-AF3E-38CC549389C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E726961C-9BF7-4863-AF3E-38CC549389C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E726961C-9BF7-4863-AF3E-38CC549389C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E726961C-9BF7-4863-AF3E-38CC549389C2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{93ACB6AD-6DAB-4F85-85BD-192B7F5F84BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{93ACB6AD-6DAB-4F85-85BD-192B7F5F84BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{93ACB6AD-6DAB-4F85-85BD-192B7F5F84BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{93ACB6AD-6DAB-4F85-85BD-192B7F5F84BC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{94C6B942-F3A5-442E-ADA1-62FAFF032E45}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{94C6B942-F3A5-442E-ADA1-62FAFF032E45}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{94C6B942-F3A5-442E-ADA1-62FAFF032E45}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{94C6B942-F3A5-442E-ADA1-62FAFF032E45}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {10363D40-A0DC-4548-8666-321E789EE8DC}
+	EndGlobalSection
+EndGlobal

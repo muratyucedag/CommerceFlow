@@ -1,0 +1,353 @@
+-------------------------------------------------------------------------------
+
+
+namespace CommerceFlow.NTierConsoleUI.Helpers
+{
+    public static class ConsoleDesign
+    {
+        public static void WriteHeader(string title)
+        {
+            Console.Clear();
+
+            Console.ForegroundColor = ConsoleColor.Cyan;
+
+            Console.WriteLine("==================================================");
+            Console.WriteLine("                 COMMERCE FLOW                    ");
+            Console.WriteLine("==================================================");
+
+            Console.ResetColor();
+
+            Console.WriteLine();
+
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("  " + title.ToUpper());
+            Console.ResetColor();
+
+            Console.WriteLine();
+        }
+
+        public static void WriteMenuItem(int number, string title)
+        {
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.Write("  [" + number + "] ");
+
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine(title);
+
+            Console.ResetColor();
+        }
+
+        public static void WriteSuccess(string message)
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("  " + message);
+            Console.ResetColor();
+        }
+
+        public static void WriteError(string message)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("  " + message);
+            Console.ResetColor();
+        }
+
+        public static void WriteInfo(string message)
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("  " + message);
+            Console.ResetColor();
+        }
+
+        public static void WaitForKey()
+        {
+            Console.WriteLine();
+
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.WriteLine("  Devam etmek için bir tuþa basýnýz...");
+            Console.ResetColor();
+
+            Console.ReadKey(true);
+        }
+    }
+}
+
+
+-------------------------------------------------------------------------------
+
+
+using CommerceFlow.NTierConsoleUI.Helpers;
+
+Console.Title = "CommerceFlow - E-Ticaret Yönetim Sistemi";
+
+bool isRunning = true;
+
+while (isRunning)
+{
+    ConsoleDesign.WriteHeader("Ana Menü");
+
+    ConsoleDesign.WriteMenuItem(1, "Ürün Ýþlemleri");
+    ConsoleDesign.WriteMenuItem(2, "Kategori Ýþlemleri");
+    ConsoleDesign.WriteMenuItem(3, "Müþteri Ýþlemleri");
+    ConsoleDesign.WriteMenuItem(4, "Sipariþ Ýþlemleri");
+    ConsoleDesign.WriteMenuItem(5, "Raporlar");
+    ConsoleDesign.WriteMenuItem(0, "Çýkýþ");
+
+    Console.WriteLine();
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Seçiminiz: ");
+    Console.ResetColor();
+
+    string? choice = Console.ReadLine();
+
+    switch (choice)
+    {
+        case "1":
+            ShowSection("Ürün Ýþlemleri");
+            break;
+
+        case "2":
+            ShowSection("Kategori Ýþlemleri");
+            break;
+
+        case "3":
+            ShowSection("Müþteri Ýþlemleri");
+            break;
+
+        case "4":
+            ShowSection("Sipariþ Ýþlemleri");
+            break;
+
+        case "5":
+            ShowSection("Raporlar");
+            break;
+
+        case "0":
+            isRunning = false;
+            break;
+
+        default:
+            ConsoleDesign.WriteError("Geçersiz seçim yaptýnýz.");
+            ConsoleDesign.WaitForKey();
+            break;
+    }
+}
+
+Console.Clear();
+ConsoleDesign.WriteSuccess("CommerceFlow uygulamasýndan çýkýþ yapýldý.");
+
+static void ShowSection(string sectionName)
+{
+    ConsoleDesign.WriteHeader(sectionName);
+
+    ConsoleDesign.WriteInfo("Bu bölümün iþlemleri daha sonra eklenecek.");
+
+    ConsoleDesign.WaitForKey();
+}
+
+
+-------------------------------------------------------------------------------
+
+
+using CommerceFlow.Business.Abstract;
+using CommerceFlow.Business.Concrete;
+using CommerceFlow.DataAccess.Interfaces;
+using CommerceFlow.DataAccess.Repositories;
+using CommerceFlow.Entities.Entities;
+using CommerceFlow.NTierConsoleUI.Helpers;
+
+Console.Title = "CommerceFlow - E-Ticaret Yönetim Sistemi";
+
+ICategoryRepository categoryRepository = new CategoryRepository();
+ICategoryService categoryService = new CategoryManager(categoryRepository);
+
+bool isRunning = true;
+
+while (isRunning)
+{
+    ConsoleRestaurantDesign.WriteHeader("Ana Menü");
+
+    ConsoleRestaurantDesign.WriteMenuItem(1, "Ürün Ýþlemleri");
+    ConsoleRestaurantDesign.WriteMenuItem(2, "Kategori Ýþlemleri");
+    ConsoleRestaurantDesign.WriteMenuItem(3, "Müþteri Ýþlemleri");
+    ConsoleRestaurantDesign.WriteMenuItem(4, "Sipariþ Ýþlemleri");
+    ConsoleRestaurantDesign.WriteMenuItem(5, "Raporlar");
+    ConsoleRestaurantDesign.WriteMenuItem(0, "Çýkýþ");
+
+    Console.WriteLine();
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Seçiminiz: ");
+    Console.ResetColor();
+
+    string? choice = Console.ReadLine();
+
+    switch (choice)
+    {
+        case "1":
+            ShowSection("Ürün Ýþlemleri");
+            break;
+
+        case "2":
+            ShowCategories();
+            break;
+
+        case "3":
+            ShowSection("Müþteri Ýþlemleri");
+            break;
+
+        case "4":
+            ShowSection("Sipariþ Ýþlemleri");
+            break;
+
+        case "5":
+            ShowSection("Raporlar");
+            break;
+
+        case "0":
+            isRunning = false;
+            break;
+
+        default:
+            ConsoleRestaurantDesign.WriteError("Geçersiz seçim yaptýnýz.");
+            ConsoleRestaurantDesign.WaitForKey();
+            break;
+    }
+}
+
+Console.Clear();
+ConsoleRestaurantDesign.WriteSuccess("CommerceFlow uygulamasýndan çýkýþ yapýldý.");
+
+void ShowCategories()
+{
+    ConsoleRestaurantDesign.WriteHeader("Kategori Listesi");
+
+    List<Category> categories = categoryService.GetAllCategories();
+
+    if (categories.Count == 0)
+    {
+        ConsoleRestaurantDesign.WriteInfo("Kayýtlý kategori bulunamadý.");
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    Console.ForegroundColor = ConsoleColor.Yellow;
+
+    Console.WriteLine("  ---------------------------------------------");
+    Console.WriteLine("  ID      KATEGORÝ ADI");
+    Console.WriteLine("  ---------------------------------------------");
+
+    Console.ResetColor();
+
+    foreach (Category category in categories)
+    {
+        Console.ForegroundColor = ConsoleColor.Cyan;
+        Console.Write($"  {category.CategoryId,-8}");
+
+        Console.ForegroundColor = ConsoleColor.White;
+        Console.WriteLine(category.CategoryName);
+    }
+
+    Console.ResetColor();
+
+    Console.ForegroundColor = ConsoleColor.DarkGray;
+    Console.WriteLine("  ---------------------------------------------");
+    Console.ResetColor();
+
+    ConsoleRestaurantDesign.WriteSuccess(
+        $"Toplam {categories.Count} kategori listelendi.");
+
+    ConsoleRestaurantDesign.WaitForKey();
+}
+
+static void ShowSection(string sectionName)
+{
+    ConsoleRestaurantDesign.WriteHeader(sectionName);
+    ConsoleRestaurantDesign.WriteInfo("Bu bölüm daha sonra eklenecek.");
+    ConsoleRestaurantDesign.WaitForKey();
+}
+
+
+
+-------------------------------------------------------------------------------
+
+
+void ShowCategoryMenu()
+{
+    bool categoryMenuRunning = true;
+
+    while (categoryMenuRunning)
+    {
+        ConsoleRestaurantDesign.WriteHeader("Kategori Yönetimi");
+
+        ConsoleRestaurantDesign.WriteMenuItem(1, "Kategorileri Listele");
+        ConsoleRestaurantDesign.WriteMenuItem(2, "Kategori Detayýný Görüntüle");
+        ConsoleRestaurantDesign.WriteMenuItem(3, "Yeni Kategori Ekle");
+        ConsoleRestaurantDesign.WriteMenuItem(4, "Kategori Güncelle");
+        ConsoleRestaurantDesign.WriteMenuItem(5, "Kategori Sil");
+        ConsoleRestaurantDesign.WriteMenuItem(0, "Ana Menüye Dön");
+
+        Console.WriteLine();
+
+        Console.ForegroundColor = ConsoleColor.Cyan;
+        Console.Write("  Seçiminiz: ");
+        Console.ResetColor();
+
+        string? choice = Console.ReadLine();
+
+        switch (choice)
+        {
+            case "1":
+                ShowCategories();
+                break;
+
+            case "2":
+                ShowCategoryPlaceholder("Kategori Detayý");
+                break;
+
+            case "3":
+                ShowCategoryPlaceholder("Yeni Kategori Ekle");
+                break;
+
+            case "4":
+                ShowCategoryPlaceholder("Kategori Güncelle");
+                break;
+
+            case "5":
+                ShowCategoryPlaceholder("Kategori Sil");
+                break;
+
+            case "0":
+                categoryMenuRunning = false;
+                break;
+
+            default:
+                ConsoleRestaurantDesign.WriteError(
+                    "Geçersiz seçim yaptýnýz.");
+
+                ConsoleRestaurantDesign.WaitForKey();
+                break;
+        }
+    }
+}
+
+
+
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------

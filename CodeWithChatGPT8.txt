@@ -1,0 +1,407 @@
+void TakeOrder(int tableNumber, string foodName);
+
+        void PrepareFood(string foodName);
+
+        void ServeFood(int tableNumber);
+
+        void ProcessPayment(decimal amount);
+
+        void PrintReceipt(int orderId);
+
+--------------------------------------------------------------------------------
+
+
+namespace RestaurantFlow.ConsoleUI.ISPExamples.BadExamples
+{
+    public class BadChef : IRestaurantEmployee
+    {
+        public string ChefName { get; set; } = "";
+
+        public void TakeOrder(int tableNumber, string foodName)
+        {
+            throw new NotSupportedException(
+                "Aþçý müþteri sipariþi alamaz.");
+        }
+
+        public void PrepareFood(string foodName)
+        {
+            if (string.IsNullOrWhiteSpace(foodName))
+            {
+                Console.WriteLine("Yemek adý boþ olamaz.");
+                return;
+            }
+
+            Console.WriteLine("Aþçý: " + ChefName);
+            Console.WriteLine("Hazýrlanan Yemek: " + foodName);
+            Console.WriteLine("Malzemeler kontrol edildi.");
+            Console.WriteLine("Piþirme iþlemi baþladý.");
+            Console.WriteLine("Yemek servise hazýrlandý.");
+        }
+
+        public void ServeFood(int tableNumber)
+        {
+            throw new NotSupportedException(
+                "Aþçý masa servisi yapamaz.");
+        }
+
+        public void ProcessPayment(decimal amount)
+        {
+            throw new NotSupportedException(
+                "Aþçý ödeme alamaz.");
+        }
+
+        public void PrintReceipt(int orderId)
+        {
+            throw new NotSupportedException(
+                "Aþçý ödeme fiþi oluþturamaz.");
+        }
+    }
+}
+
+
+
+--------------------------------------------------------------------------------
+
+using RestaurantFlow.ConsoleUI.ISPExamples.BadExamples;
+
+IRestaurantEmployee employee = new BadChef
+{
+    ChefName = "Ahmet Yýlmaz"
+};
+
+employee.PrepareFood("Hamburger");
+
+Console.WriteLine();
+
+try
+{
+    employee.ProcessPayment(850);
+}
+catch (NotSupportedException ex)
+{
+    Console.WriteLine("Hata: " + ex.Message);
+}
+
+Console.ReadLine();
+
+
+--------------------------------------------------------------------------------
+
+
+using RestaurantFlow.ConsoleUI.ISPExamples.Interfaces;
+
+namespace RestaurantFlow.ConsoleUI.ISPExamples.Employees
+{
+    public class Waiter : IOrderService
+    {
+        public string FullName { get; set; } = "";
+        public int TotalOrders { get; private set; }
+        public int LastOrderTable { get; private set; }
+
+        public void TakeOrder(
+            int tableNumber,
+            string foodName,
+            int quantity)
+        {
+            Console.WriteLine("===== SÝPARÝÞ ALMA =====");
+
+            if (tableNumber <= 0)
+            {
+                Console.WriteLine("Geçersiz masa numarasý.");
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(foodName))
+            {
+                Console.WriteLine("Yemek adý boþ olamaz.");
+                return;
+            }
+
+            if (quantity <= 0)
+            {
+                Console.WriteLine("Sipariþ miktarý geçersiz.");
+                return;
+            }
+
+            TotalOrders++;
+            LastOrderTable = tableNumber;
+
+            Console.WriteLine("Garson: " + FullName);
+            Console.WriteLine("Masa No: " + tableNumber);
+            Console.WriteLine("Yemek: " + foodName);
+            Console.WriteLine("Adet: " + quantity);
+            Console.WriteLine("Sipariþ mutfaða iletildi.");
+            Console.WriteLine("Toplam Sipariþ Sayýsý: " + TotalOrders);
+        }
+
+        public void ServeFood(int tableNumber)
+        {
+            Console.WriteLine("===== YEMEK SERVÝSÝ =====");
+
+            if (tableNumber <= 0)
+            {
+                Console.WriteLine("Geçersiz masa numarasý.");
+                return;
+            }
+
+            if (tableNumber != LastOrderTable)
+            {
+                Console.WriteLine(
+                    "Bu masa için kayýtlý sipariþ bulunamadý.");
+                return;
+            }
+
+            Console.WriteLine("Garson: " + FullName);
+            Console.WriteLine("Masa No: " + tableNumber);
+            Console.WriteLine("Hazýrlanan yemekler kontrol edildi.");
+            Console.WriteLine("Yemekler masaya servis edildi.");
+        }
+    }
+}
+
+
+
+--------------------------------------------------------------------------------
+
+
+using RestaurantFlow.ConsoleUI.ISPExamples.Interfaces;
+
+namespace RestaurantFlow.ConsoleUI.ISPExamples.Employees
+{
+    public class Chef : IKitchenService
+    {
+        public string FullName { get; set; } = "";
+        public string Specialty { get; set; } = "";
+        public int PreparedMealCount { get; private set; }
+
+        public void PrepareFood(string foodName, int quantity)
+        {
+            Console.WriteLine("===== YEMEK HAZIRLAMA =====");
+
+            if (string.IsNullOrWhiteSpace(foodName))
+            {
+                Console.WriteLine("Yemek adý boþ olamaz.");
+                return;
+            }
+
+            if (quantity <= 0)
+            {
+                Console.WriteLine("Hazýrlanacak miktar geçersiz.");
+                return;
+            }
+
+            Console.WriteLine("Aþçý: " + FullName);
+            Console.WriteLine("Uzmanlýk: " + Specialty);
+            Console.WriteLine("Yemek: " + foodName);
+            Console.WriteLine("Adet: " + quantity);
+
+            Console.WriteLine("Malzemeler hazýrlanýyor.");
+            Console.WriteLine("Piþirme süreci baþlatýldý.");
+            Console.WriteLine("Porsiyonlar hazýrlanýyor.");
+
+            PreparedMealCount += quantity;
+
+            Console.WriteLine("Yemekler servise hazýr.");
+            Console.WriteLine(
+                "Hazýrlanan Toplam Porsiyon: " + PreparedMealCount);
+        }
+
+        public void CheckKitchenStock(
+            string ingredient,
+            int stockQuantity)
+        {
+            Console.WriteLine("===== MUTFAK STOK KONTROLÜ =====");
+
+            if (string.IsNullOrWhiteSpace(ingredient))
+            {
+                Console.WriteLine("Malzeme adý boþ olamaz.");
+                return;
+            }
+
+            Console.WriteLine("Malzeme: " + ingredient);
+            Console.WriteLine("Stok Miktarý: " + stockQuantity);
+
+            if (stockQuantity < 0)
+            {
+                Console.WriteLine("Geçersiz stok miktarý.");
+            }
+            else if (stockQuantity < 5)
+            {
+                Console.WriteLine("Stok kritik seviyede.");
+                Console.WriteLine("Yeni malzeme sipariþi gerekli.");
+            }
+            else
+            {
+                Console.WriteLine("Stok seviyesi yeterli.");
+            }
+        }
+    }
+}
+
+
+
+--------------------------------------------------------------------------------
+
+
+using RestaurantFlow.ConsoleUI.ISPExamples.Interfaces;
+
+namespace RestaurantFlow.ConsoleUI.ISPExamples.Employees
+{
+    public class Cashier : IPaymentService
+    {
+        public string FullName { get; set; } = "";
+        public decimal TotalRevenue { get; private set; }
+        public int CompletedPaymentCount { get; private set; }
+
+        private bool _hasUnreceiptedPayment;
+        private decimal _lastPaidAmount;
+
+        public bool ProcessPayment(
+            decimal amount,
+            decimal receivedAmount)
+        {
+            Console.WriteLine("===== ÖDEME ÝÞLEMÝ =====");
+
+            if (amount <= 0)
+            {
+                Console.WriteLine("Ödeme tutarý geçersiz.");
+                return false;
+            }
+
+            if (receivedAmount < amount)
+            {
+                Console.WriteLine("Alýnan tutar yetersiz.");
+                Console.WriteLine(
+                    "Eksik Tutar: " + (amount - receivedAmount) + " TL");
+
+                return false;
+            }
+
+            if (_hasUnreceiptedPayment)
+            {
+                Console.WriteLine(
+                    "Önce önceki ödemenin fiþini oluþturun.");
+
+                return false;
+            }
+
+            decimal change = receivedAmount - amount;
+
+            TotalRevenue += amount;
+            CompletedPaymentCount++;
+            _lastPaidAmount = amount;
+            _hasUnreceiptedPayment = true;
+
+            Console.WriteLine("Kasiyer: " + FullName);
+            Console.WriteLine("Ödeme Tutarý: " + amount + " TL");
+            Console.WriteLine("Alýnan Tutar: " + receivedAmount + " TL");
+            Console.WriteLine("Para Üstü: " + change + " TL");
+            Console.WriteLine("Ödeme baþarýyla tamamlandý.");
+
+            return true;
+        }
+
+        public void PrintReceipt(int orderId, decimal amount)
+        {
+            Console.WriteLine("===== ÖDEME FÝÞÝ =====");
+
+            if (!_hasUnreceiptedPayment)
+            {
+                Console.WriteLine("Fiþ oluþturulacak ödeme bulunamadý.");
+                return;
+            }
+
+            if (orderId <= 0 || amount != _lastPaidAmount)
+            {
+                Console.WriteLine("Fiþ bilgileri ödeme ile uyuþmuyor.");
+                return;
+            }
+
+            Console.WriteLine("RestaurantFlow");
+            Console.WriteLine("Sipariþ No: " + orderId);
+            Console.WriteLine("Kasiyer: " + FullName);
+            Console.WriteLine("Ödenen Tutar: " + amount + " TL");
+            Console.WriteLine("Ödeme Durumu: Baþarýlý");
+            Console.WriteLine("Fiþ oluþturuldu.");
+
+            _hasUnreceiptedPayment = false;
+        }
+
+        public void ShowDailyRevenue()
+        {
+            Console.WriteLine("===== KASA ÖZETÝ =====");
+
+            Console.WriteLine("Kasiyer: " + FullName);
+
+            Console.WriteLine(
+                "Tamamlanan Ödeme: " + CompletedPaymentCount);
+
+            Console.WriteLine(
+                "Toplam Tahsilat: " + TotalRevenue + " TL");
+        }
+    }
+}
+
+
+
+--------------------------------------------------------------------------------
+
+
+using RestaurantFlow.ConsoleUI.ISPExamples.Employees;
+
+Waiter waiter = new Waiter();
+waiter.FullName = "Mehmet Demir";
+
+Chef chef = new Chef();
+chef.FullName = "Ahmet Yýlmaz";
+chef.Specialty = "Izgara Yemekleri";
+
+Cashier cashier = new Cashier();
+cashier.FullName = "Zeynep Kaya";
+
+Console.WriteLine("=== RESTAURANTFLOW ===");
+Console.WriteLine("=== GÜNLÜK RESTORAN OPERASYONLARI ===");
+
+Console.WriteLine();
+
+// 1. Garson sipariþ alýyor.
+waiter.TakeOrder(12, "Hamburger Menü", 2);
+
+Console.WriteLine();
+
+// 2. Aþçý stok kontrolü yapýyor.
+chef.CheckKitchenStock("Hamburger Ekmeði", 15);
+
+Console.WriteLine();
+
+// 3. Aþçý yemekleri hazýrlýyor.
+chef.PrepareFood("Hamburger Menü", 2);
+
+Console.WriteLine();
+
+// 4. Garson yemekleri servis ediyor.
+waiter.ServeFood(12);
+
+Console.WriteLine();
+
+// 5. Kasiyer ödeme alýyor.
+bool paymentResult = cashier.ProcessPayment(700, 1000);
+
+Console.WriteLine();
+
+// 6. Ödeme baþarýlýysa fiþ oluþturuluyor.
+if (paymentResult)
+{
+    cashier.PrintReceipt(1001, 700);
+}
+
+Console.WriteLine();
+
+// 7. Günlük kasa özeti görüntüleniyor.
+cashier.ShowDailyRevenue();
+
+Console.ReadLine();
+
+
+
+--------------------------------------------------------------------------------

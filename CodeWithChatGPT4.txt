@@ -1,0 +1,196 @@
+
+using LogisticsApp.ConsoleUI.Interfaces;
+
+namespace LogisticsApp.ConsoleUI.Services
+{
+    public class FastCargo : IShippingService
+    {
+        public string CompanyName { get; set; } = "FastCargo";
+        public string TrackingNumber { get; set; } = "";
+        public string ShipmentStatus { get; set; } = "Henüz oluþturulmadý";
+
+        public void CreateShipment()
+        {
+            TrackingNumber = "FC1001";
+            ShipmentStatus = "Gönderi oluþturuldu";
+
+            Console.WriteLine("Kargo Firmasý: " + CompanyName);
+            Console.WriteLine("Takip Numarasý: " + TrackingNumber);
+            Console.WriteLine("Yeni gönderi oluþturuldu.");
+        }
+
+        public void TrackShipment()
+        {
+            Console.WriteLine("Takip Numarasý: " + TrackingNumber);
+            Console.WriteLine("Gönderi Durumu: " + ShipmentStatus);
+        }
+
+        public void CancelShipment()
+        {
+            ShipmentStatus = "Ýptal edildi";
+
+            Console.WriteLine("Gönderi iptal edildi.");
+        }
+    }
+}
+
+
+
+
+------------------------------------------------------------------------------
+
+using LogisticsApp.ConsoleUI.Services;
+
+FastCargo fastCargo = new FastCargo();
+
+Console.WriteLine("=== FAST CARGO ===");
+
+fastCargo.CreateShipment();
+
+Console.WriteLine();
+
+fastCargo.TrackShipment();
+
+Console.WriteLine();
+
+fastCargo.CancelShipment();
+
+Console.WriteLine();
+
+fastCargo.TrackShipment();
+
+Console.ReadLine();
+
+
+------------------------------------------------------------------------------
+
+
+using LogisticsApp.ConsoleUI.Interfaces;
+
+namespace LogisticsApp.ConsoleUI.Services
+{
+    public class NationalCargo : IShippingService
+    {
+        public string CompanyName { get; set; } = "NationalCargo";
+        public string TrackingNumber { get; set; } = "";
+        public string ShipmentStatus { get; set; } = "Henüz oluþturulmadý";
+
+        public string SenderCity { get; set; } = "";
+        public string ReceiverCity { get; set; } = "";
+        public string TransferCenter { get; set; } = "";
+
+        public void CreateShipment()
+        {
+            TrackingNumber = "NC2001";
+            ShipmentStatus = "Aktarma merkezine hazýrlanýyor";
+
+            Console.WriteLine("Kargo Firmasý: " + CompanyName);
+            Console.WriteLine("Takip Numarasý: " + TrackingNumber);
+            Console.WriteLine("Gönderici Þehir: " + SenderCity);
+            Console.WriteLine("Alýcý Þehir: " + ReceiverCity);
+            Console.WriteLine("Þehirler arasý gönderi oluþturuldu.");
+        }
+
+        public void TrackShipment()
+        {
+            Console.WriteLine("Takip Numarasý: " + TrackingNumber);
+            Console.WriteLine("Gönderi Durumu: " + ShipmentStatus);
+            Console.WriteLine("Aktarma Merkezi: " + TransferCenter);
+        }
+
+        public void CancelShipment()
+        {
+            if (ShipmentStatus == "Aktarma merkezine hazýrlanýyor")
+            {
+                ShipmentStatus = "Ýptal edildi";
+                Console.WriteLine("Gönderi iptal edildi.");
+            }
+            else
+            {
+                Console.WriteLine("Gönderi bu aþamada iptal edilemiyor.");
+            }
+        }
+
+        // NationalCargo sýnýfýna özgü metot
+        public void SendToTransferCenter()
+        {
+            ShipmentStatus = "Aktarma merkezinde";
+
+            Console.WriteLine(
+                "Gönderi " + TransferCenter + " aktarma merkezine ulaþtý.");
+        }
+    }
+}
+
+
+------------------------------------------------------------------------------
+
+
+using LogisticsApp.ConsoleUI.Services;
+
+NationalCargo nationalCargo = new NationalCargo();
+
+nationalCargo.SenderCity = "Ýstanbul";
+nationalCargo.ReceiverCity = "Ankara";
+nationalCargo.TransferCenter = "Ankara Merkez";
+
+Console.WriteLine("=== NATIONAL CARGO ===");
+
+nationalCargo.CreateShipment();
+
+Console.WriteLine();
+
+nationalCargo.TrackShipment();
+
+Console.WriteLine();
+
+nationalCargo.SendToTransferCenter();
+
+Console.WriteLine();
+
+nationalCargo.TrackShipment();
+
+Console.WriteLine();
+
+nationalCargo.CancelShipment();
+
+Console.ReadLine();
+
+
+
+------------------------------------------------------------------------------
+
+
+using LogisticsApp.ConsoleUI.Services;
+
+NationalCargo nationalCargo = new NationalCargo();
+
+nationalCargo.SenderCity = "Ýstanbul";
+nationalCargo.ReceiverCity = "Ankara";
+nationalCargo.TransferCenter = "Ankara Merkez";
+
+Console.WriteLine("=== KARGO ÝÞLEMLERÝ ===");
+
+nationalCargo.CreateShipment();
+nationalCargo.TrackShipment();
+
+Console.WriteLine();
+
+Console.WriteLine("=== BÝLDÝRÝM ÝÞLEMLERÝ ===");
+
+nationalCargo.SendSms("05551234567");
+
+Console.WriteLine();
+
+nationalCargo.SendEmail("musteri@example.com");
+
+Console.ReadLine();
+
+
+
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------

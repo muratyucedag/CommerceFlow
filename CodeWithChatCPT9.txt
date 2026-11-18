@@ -1,0 +1,622 @@
+
+using CommerceFlow.Business.Abstract;
+using CommerceFlow.DataAccess.Interfaces;
+using CommerceFlow.Entities.Entities;
+
+namespace CommerceFlow.Business.Concrete
+{
+    public class ProductManager : IProductService
+    {
+        private readonly IProductRepository _productRepository;
+
+        public ProductManager(IProductRepository productRepository)
+        {
+            _productRepository = productRepository;
+        }
+
+        public void AddProduct(Product product)
+        {
+            if (string.IsNullOrWhiteSpace(product.ProductName))
+            {
+                Console.WriteLine("Ürün adý boþ olamaz.");
+                return;
+            }
+
+            if (product.ProductPrice <= 0)
+            {
+                Console.WriteLine("Ürün fiyatý sýfýrdan büyük olmalýdýr.");
+                return;
+            }
+
+            if (product.ProductStock < 0)
+            {
+                Console.WriteLine("Ürün stok miktarý negatif olamaz.");
+                return;
+            }
+
+            if (product.CategoryId <= 0)
+            {
+                Console.WriteLine("Geçerli bir kategori seçilmelidir.");
+                return;
+            }
+
+            _productRepository.Insert(product);
+
+            Console.WriteLine("Ürün baþarýyla eklendi.");
+        }
+
+        public void UpdateProduct(Product product)
+        {
+            if (product.ProductId <= 0)
+            {
+                Console.WriteLine("Geçersiz ürün ID deðeri.");
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(product.ProductName) ||
+                product.ProductPrice <= 0 ||
+                product.ProductStock < 0 ||
+                product.CategoryId <= 0)
+            {
+                Console.WriteLine("Ürün bilgileri geçersiz.");
+                return;
+            }
+
+            Product? existingProduct =
+                _productRepository.GetById(product.ProductId);
+
+            if (existingProduct == null)
+            {
+                Console.WriteLine("Güncellenecek ürün bulunamadý.");
+                return;
+            }
+
+            _productRepository.Update(product);
+
+            Console.WriteLine("Ürün baþarýyla güncellendi.");
+        }
+
+        public void DeleteProduct(int id)
+        {
+            Product? product = _productRepository.GetById(id);
+
+            if (product == null)
+            {
+                Console.WriteLine("Silinecek ürün bulunamadý.");
+                return;
+            }
+
+            _productRepository.Delete(product);
+
+            Console.WriteLine("Ürün baþarýyla silindi.");
+        }
+
+        public List<Product> GetAllProducts()
+        {
+            return _productRepository.GetAll();
+        }
+
+        public Product? GetProductById(int id)
+        {
+            if (id <= 0)
+            {
+                return null;
+            }
+
+            return _productRepository.GetById(id);
+        }
+    }
+}
+
+------------------------------------------------------------------------------------------
+
+
+using CommerceFlow.Business.Abstract;
+using CommerceFlow.DataAccess.Interfaces;
+using CommerceFlow.Entities.Entities;
+
+namespace CommerceFlow.Business.Concrete
+{
+    public class CategoryManager : ICategoryService
+    {
+        private readonly ICategoryRepository _categoryRepository;
+
+        public CategoryManager(ICategoryRepository categoryRepository)
+        {
+            _categoryRepository = categoryRepository;
+        }
+
+        public void AddCategory(Category category)
+        {
+            if (category == null)
+            {
+                Console.WriteLine("Kategori bilgisi bulunamadý.");
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(category.CategoryName))
+            {
+                Console.WriteLine("Kategori adý boþ olamaz.");
+                return;
+            }
+
+            if (category.CategoryName.Length < 3)
+            {
+                Console.WriteLine("Kategori adý en az 3 karakter olmalýdýr.");
+                return;
+            }
+
+            var categories = _categoryRepository.GetAll();
+
+            bool categoryExists = categories.Any(x =>
+                x.CategoryName.ToLower() ==
+                category.CategoryName.Trim().ToLower());
+
+            if (categoryExists)
+            {
+                Console.WriteLine("Bu isimde bir kategori zaten mevcut.");
+                return;
+            }
+
+            category.CategoryName = category.CategoryName.Trim();
+
+            _categoryRepository.Insert(category);
+
+            Console.WriteLine("Kategori baþarýyla eklendi.");
+        }
+
+        public void UpdateCategory(Category category)
+        {
+            if (category == null || category.CategoryId <= 0)
+            {
+                Console.WriteLine("Kategori bilgileri geçersiz.");
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(category.CategoryName))
+            {
+                Console.WriteLine("Kategori adý boþ olamaz.");
+                return;
+            }
+
+            if (category.CategoryName.Trim().Length < 3)
+            {
+                Console.WriteLine("Kategori adý en az 3 karakter olmalýdýr.");
+                return;
+            }
+
+            Category? existingCategory =
+                _categoryRepository.GetById(category.CategoryId);
+
+            if (existingCategory == null)
+            {
+                Console.WriteLine("Güncellenecek kategori bulunamadý.");
+                return;
+            }
+
+            var categories = _categoryRepository.GetAll();
+
+            bool categoryExists = categories.Any(x =>
+                x.CategoryId != category.CategoryId &&
+                x.CategoryName.ToLower() ==
+                category.CategoryName.Trim().ToLower());
+
+            if (categoryExists)
+            {
+                Console.WriteLine("Bu isim baþka bir kategoride kullanýlýyor.");
+                return;
+            }
+
+            category.CategoryName = category.CategoryName.Trim();
+
+            _categoryRepository.Update(category);
+
+            Console.WriteLine("Kategori baþarýyla güncellendi.");
+        }
+
+        public void DeleteCategory(int id)
+        {
+            if (id <= 0)
+            {
+                Console.WriteLine("Geçersiz kategori ID deðeri.");
+                return;
+            }
+
+            Category? category = _categoryRepository.GetById(id);
+
+            if (category == null)
+            {
+                Console.WriteLine("Silinecek kategori bulunamadý.");
+                return;
+            }
+
+            _categoryRepository.Delete(category);
+
+            Console.WriteLine("Kategori baþarýyla silindi.");
+        }
+
+        public List<Category> GetAllCategories()
+        {
+            return _categoryRepository.GetAll();
+        }
+
+        public Category? GetCategoryById(int id)
+        {
+            if (id <= 0)
+            {
+                return null;
+            }
+
+            return _categoryRepository.GetById(id);
+        }
+    }
+}
+
+
+
+------------------------------------------------------------------------------------------
+
+
+using CommerceFlow.Business.Abstract;
+using CommerceFlow.DataAccess.Interfaces;
+using CommerceFlow.Entities.Entities;
+
+namespace CommerceFlow.Business.Concrete
+{
+    public class CustomerManager : ICustomerService
+    {
+        private readonly ICustomerRepository _customerRepository;
+
+        public CustomerManager(ICustomerRepository customerRepository)
+        {
+            _customerRepository = customerRepository;
+        }
+
+        public void AddCustomer(Customer customer)
+        {
+            if (customer == null)
+            {
+                Console.WriteLine("Müþteri bilgisi bulunamadý.");
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(customer.CustomerName) ||
+                string.IsNullOrWhiteSpace(customer.CustomerSurname))
+            {
+                Console.WriteLine("Müþteri adý ve soyadý boþ olamaz.");
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(customer.CustomerEmail) ||
+                !customer.CustomerEmail.Contains("@"))
+            {
+                Console.WriteLine("Geçerli bir e-posta adresi giriniz.");
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(customer.CustomerPhone))
+            {
+                Console.WriteLine("Telefon numarasý boþ olamaz.");
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(customer.CustomerAddress))
+            {
+                Console.WriteLine("Müþteri adresi boþ olamaz.");
+                return;
+            }
+
+            customer.CustomerEmail = customer.CustomerEmail.Trim();
+
+            Customer? existingCustomer =
+                _customerRepository.GetCustomerByEmail(
+                    customer.CustomerEmail);
+
+            if (existingCustomer != null)
+            {
+                Console.WriteLine(
+                    "Bu e-posta adresiyle kayýtlý bir müþteri mevcut.");
+
+                return;
+            }
+
+            _customerRepository.Insert(customer);
+
+            Console.WriteLine("Müþteri baþarýyla kaydedildi.");
+        }
+
+        public void UpdateCustomer(Customer customer)
+        {
+            if (customer == null || customer.CustomerId <= 0)
+            {
+                Console.WriteLine("Müþteri bilgileri geçersiz.");
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(customer.CustomerName) ||
+                string.IsNullOrWhiteSpace(customer.CustomerSurname) ||
+                string.IsNullOrWhiteSpace(customer.CustomerEmail) ||
+                !customer.CustomerEmail.Contains("@") ||
+                string.IsNullOrWhiteSpace(customer.CustomerPhone) ||
+                string.IsNullOrWhiteSpace(customer.CustomerAddress))
+            {
+                Console.WriteLine("Müþteri bilgileri eksik veya geçersiz.");
+                return;
+            }
+
+            Customer? existingCustomer =
+                _customerRepository.GetById(customer.CustomerId);
+
+            if (existingCustomer == null)
+            {
+                Console.WriteLine("Güncellenecek müþteri bulunamadý.");
+                return;
+            }
+
+            customer.CustomerEmail = customer.CustomerEmail.Trim();
+
+            Customer? emailOwner =
+                _customerRepository.GetCustomerByEmail(
+                    customer.CustomerEmail);
+
+            if (emailOwner != null &&
+                emailOwner.CustomerId != customer.CustomerId)
+            {
+                Console.WriteLine(
+                    "Bu e-posta baþka bir müþteri tarafýndan kullanýlýyor.");
+
+                return;
+            }
+
+            _customerRepository.Update(customer);
+
+            Console.WriteLine("Müþteri bilgileri güncellendi.");
+        }
+
+        public void DeleteCustomer(int id)
+        {
+            if (id <= 0)
+            {
+                Console.WriteLine("Geçersiz müþteri ID deðeri.");
+                return;
+            }
+
+            Customer? customer = _customerRepository.GetById(id);
+
+            if (customer == null)
+            {
+                Console.WriteLine("Silinecek müþteri bulunamadý.");
+                return;
+            }
+
+            _customerRepository.Delete(customer);
+
+            Console.WriteLine("Müþteri baþarýyla silindi.");
+        }
+
+        public List<Customer> GetAllCustomers()
+        {
+            return _customerRepository.GetAll();
+        }
+
+        public Customer? GetCustomerById(int id)
+        {
+            if (id <= 0)
+            {
+                return null;
+            }
+
+            return _customerRepository.GetById(id);
+        }
+
+        public Customer? GetCustomerByEmail(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                return null;
+            }
+
+            return _customerRepository.GetCustomerByEmail(email.Trim());
+        }
+    }
+}
+
+
+------------------------------------------------------------------------------------------
+
+
+using CommerceFlow.Business.Abstract;
+using CommerceFlow.DataAccess.Interfaces;
+using CommerceFlow.Entities.Entities;
+
+namespace CommerceFlow.Business.Concrete
+{
+    public class OrderManager : IOrderService
+    {
+        private readonly IOrderRepository _orderRepository;
+        private readonly IProductRepository _productRepository;
+        private readonly ICustomerRepository _customerRepository;
+
+        public OrderManager(
+            IOrderRepository orderRepository,
+            IProductRepository productRepository,
+            ICustomerRepository customerRepository)
+        {
+            _orderRepository = orderRepository;
+            _productRepository = productRepository;
+            _customerRepository = customerRepository;
+        }
+
+        public void AddOrder(Order order)
+        {
+            if (order == null)
+            {
+                Console.WriteLine("Sipariþ bilgileri bulunamadý.");
+                return;
+            }
+
+            if (order.OrderQuantity <= 0)
+            {
+                Console.WriteLine("Sipariþ miktarý sýfýrdan büyük olmalýdýr.");
+                return;
+            }
+
+            Customer? customer =
+                _customerRepository.GetById(order.CustomerId);
+
+            if (customer == null)
+            {
+                Console.WriteLine("Müþteri bulunamadý.");
+                return;
+            }
+
+            Product? product =
+                _productRepository.GetById(order.ProductId);
+
+            if (product == null)
+            {
+                Console.WriteLine("Ürün bulunamadý.");
+                return;
+            }
+
+            if (product.ProductPrice <= 0)
+            {
+                Console.WriteLine("Ürün fiyatý geçersiz.");
+                return;
+            }
+
+            if (product.ProductStock < order.OrderQuantity)
+            {
+                Console.WriteLine("Yetersiz ürün stoðu.");
+                Console.WriteLine(
+                    "Mevcut Stok: " + product.ProductStock);
+                return;
+            }
+
+            order.OrderTotalPrice =
+                product.ProductPrice * order.OrderQuantity;
+
+            order.OrderDate = DateTime.Now;
+            order.OrderStatus = "Hazýrlanýyor";
+
+            product.ProductStock -= order.OrderQuantity;
+
+            _orderRepository.Insert(order);
+            _productRepository.Update(product);
+
+            Console.WriteLine("Sipariþ baþarýyla oluþturuldu.");
+            Console.WriteLine("Sipariþ No: " + order.OrderId);
+            Console.WriteLine("Müþteri: " +
+                customer.CustomerName + " " + customer.CustomerSurname);
+            Console.WriteLine("Ürün: " + product.ProductName);
+            Console.WriteLine("Adet: " + order.OrderQuantity);
+            Console.WriteLine("Toplam Tutar: " + order.OrderTotalPrice + " TL");
+            Console.WriteLine("Kalan Stok: " + product.ProductStock);
+        }
+
+        public void UpdateOrderStatus(int orderId, string status)
+        {
+            Order? order = _orderRepository.GetById(orderId);
+
+            if (order == null)
+            {
+                Console.WriteLine("Sipariþ bulunamadý.");
+                return;
+            }
+
+            if (order.OrderStatus == "Ýptal Edildi")
+            {
+                Console.WriteLine("Ýptal edilen sipariþ güncellenemez.");
+                return;
+            }
+
+            if (order.OrderStatus == "Teslim Edildi")
+            {
+                Console.WriteLine("Teslim edilen sipariþ güncellenemez.");
+                return;
+            }
+
+            if (status != "Kargoda" && status != "Teslim Edildi")
+            {
+                Console.WriteLine("Geçersiz sipariþ durumu.");
+                return;
+            }
+
+            if (order.OrderStatus == "Hazýrlanýyor" &&
+                status == "Teslim Edildi")
+            {
+                Console.WriteLine(
+                    "Sipariþ önce kargoya verilmelidir.");
+                return;
+            }
+
+            order.OrderStatus = status;
+
+            _orderRepository.Update(order);
+
+            Console.WriteLine("Sipariþ durumu güncellendi.");
+            Console.WriteLine("Yeni Durum: " + order.OrderStatus);
+        }
+
+        public void CancelOrder(int orderId)
+        {
+            Order? order = _orderRepository.GetById(orderId);
+
+            if (order == null)
+            {
+                Console.WriteLine("Sipariþ bulunamadý.");
+                return;
+            }
+
+            if (order.OrderStatus == "Ýptal Edildi")
+            {
+                Console.WriteLine("Bu sipariþ zaten iptal edilmiþ.");
+                return;
+            }
+
+            if (order.OrderStatus != "Hazýrlanýyor")
+            {
+                Console.WriteLine(
+                    "Yalnýzca hazýrlanan sipariþler iptal edilebilir.");
+                return;
+            }
+
+            Product? product =
+                _productRepository.GetById(order.ProductId);
+
+            if (product == null)
+            {
+                Console.WriteLine("Sipariþe ait ürün bulunamadý.");
+                return;
+            }
+
+            product.ProductStock += order.OrderQuantity;
+
+            order.OrderStatus = "Ýptal Edildi";
+
+            _productRepository.Update(product);
+            _orderRepository.Update(order);
+
+            Console.WriteLine("Sipariþ iptal edildi.");
+            Console.WriteLine(
+                "Ýade Edilen Stok: " + order.OrderQuantity);
+            Console.WriteLine(
+                "Güncel Stok: " + product.ProductStock);
+        }
+
+        public List<Order> GetAllOrders()
+        {
+            return _orderRepository.GetAll();
+        }
+
+        public Order? GetOrderById(int id)
+        {
+            if (id <= 0)
+            {
+                return null;
+            }
+
+            return _orderRepository.GetById(id);
+        }
+    }
+}

@@ -1,0 +1,45 @@
+using CommerceFlow.ConsoleUI.Entities;
+
+Console.WriteLine("========================================");
+Console.WriteLine("       COMMERCEFLOW E-COMMERCE");
+Console.WriteLine("========================================");
+Console.WriteLine();
+Console.WriteLine("1  - Ürünleri Listele");
+Console.WriteLine("2  - Kategorileri Listele");
+Console.WriteLine("3  - Ürün Ara");
+Console.WriteLine("4  - Ürün Detaylarýný Görüntüle");
+Console.WriteLine("5  - Sepete Ürün Ekle");
+Console.WriteLine("6  - Sepetim");
+Console.WriteLine("7  - Sepetten Ürün Çýkar");
+Console.WriteLine("8  - Ýndirimler ve Kampanyalar");
+Console.WriteLine("9  - Favorilerim");
+Console.WriteLine("10 - Sipariþ Oluþtur");
+Console.WriteLine("11 - Sipariþlerim");
+Console.WriteLine("12 - Sipariþ Detaylarýný Görüntüle");
+Console.WriteLine("13 - Sipariþ Ýptal Et");
+Console.WriteLine("14 - Ödeme Yöntemleri");
+Console.WriteLine("15 - Adreslerim");
+Console.WriteLine("16 - Profil Bilgilerim");
+Console.WriteLine("17 - Çýkýþ");
+Console.WriteLine();
+Console.WriteLine("----------------------------------------");
+Console.Write("Lütfen yapmak istediðiniz iþlemi seçiniz: ");
+
+string? secim = Console.ReadLine();
+
+if (secim == "1")
+{
+    Product p = new Product();
+    p.CategoryId = 1;
+    p.ProductId = 1204;
+    p.ProductName = "Bilgisayar";
+    p.StockQuantity = 100;
+    p.Price = 45000;
+    p.Description = "Yeni nesil güçlü iþlemci";
+    p.IsActive = true;
+    p.ProductCode = "BLG001";
+
+    Console.WriteLine("Ürün Adý: " + p.ProductName);
+    Console.WriteLine("Fiyatý: " + p.Price);
+    Console.WriteLine("Stok: " + p.StockQuantity + " - " + " Ürün Kodu: " + p.ProductCode);
+}

@@ -1,0 +1,363 @@
+
+INSERT INTO [CommerceFlowDb].[dbo].[Categories] (CategoryName)
+VALUES
+(N'Bilgisayar ve Tablet'),
+(N'Cep Telefonu ve Aksesuarlarý'),
+(N'Televizyon ve Ses Sistemleri'),
+(N'Beyaz Eþya'),
+(N'Küçük Ev Aletleri'),
+(N'Ev ve Yaþam'),
+(N'Mobilya ve Dekorasyon'),
+(N'Giyim ve Moda'),
+(N'Ayakkabý ve Çanta'),
+(N'Kozmetik ve Kiþisel Bakým'),
+(N'Spor ve Outdoor'),
+(N'Kitap ve Kýrtasiye'),
+(N'Oyun ve Oyuncak'),
+(N'Otomotiv ve Motosiklet'),
+(N'Süpermarket ve Gýda');
+
+----------------------------------------------------------------------------------------
+
+
+INSERT INTO [CommerceFlowDb].[dbo].[Products]
+(ProductName, ProductPrice, ProductStock, CategoryId)
+VALUES
+-- 1. Bilgisayar ve Tablet
+(N'Lenovo ThinkPad E16 Dizüstü Bilgisayar', 38999.90, 15, 1),
+(N'Apple iPad Air 11 Ýnç Tablet', 32999.00, 22, 1),
+
+-- 2. Cep Telefonu ve Aksesuarlarý
+(N'Samsung Galaxy S25 256 GB', 52999.00, 12, 2),
+(N'Apple iPhone 16 128 GB', 57999.00, 9, 2),
+
+-- 3. Televizyon ve Ses Sistemleri
+(N'Samsung 55 Ýnç 4K Smart TV', 28999.00, 14, 3),
+(N'JBL Charge 5 Bluetooth Hoparlör', 6999.00, 35, 3),
+
+-- 4. Beyaz Eþya
+(N'Bosch Serie 6 Çamaþýr Makinesi', 34999.00, 8, 4),
+(N'Arçelik No Frost Buzdolabý', 41999.00, 11, 4),
+
+-- 5. Küçük Ev Aletleri
+(N'Philips Airfryer XXL', 8999.00, 28, 5),
+(N'Delonghi Magnifica Kahve Makinesi', 24999.00, 13, 5),
+
+-- 6. Ev ve Yaþam
+(N'Karaca 12 Kiþilik Yemek Takýmý', 6499.00, 24, 6),
+(N'Taç Pamuklu Nevresim Takýmý', 1899.00, 52, 6),
+
+-- 7. Mobilya ve Dekorasyon
+(N'Ýstikbal Üçlü Koltuk', 22999.00, 6, 7),
+(N'Çalýþma Masasý 120 cm', 4499.00, 19, 7),
+
+-- 8. Giyim ve Moda
+(N'Levis 501 Erkek Jean Pantolon', 3299.00, 46, 8),
+(N'Mavi Kadýn Denim Ceket', 2499.00, 38, 8),
+
+-- 9. Ayakkabý ve Çanta
+(N'Nike Air Max Spor Ayakkabý', 5999.00, 31, 9),
+(N'Adidas Classic Sýrt Çantasý', 1599.00, 44, 9),
+
+-- 10. Kozmetik ve Kiþisel Bakým
+(N'La Roche Posay Güneþ Kremi SPF50', 1099.00, 67, 10),
+(N'Philips Series 5000 Týraþ Makinesi', 3999.00, 27, 10),
+
+-- 11. Spor ve Outdoor
+(N'Domyos Katlanabilir Kondisyon Bisikleti', 11999.00, 10, 11),
+(N'Quechua 3 Kiþilik Kamp Çadýrý', 5499.00, 21, 11),
+
+-- 12. Kitap ve Kýrtasiye
+(N'Atomik Alýþkanlýklar - James Clear', 349.00, 95, 12),
+(N'Faber Castell 24 Renk Boya Kalemi', 499.00, 72, 12),
+
+-- 13. Oyun ve Oyuncak
+(N'LEGO Technic Yarýþ Arabasý', 3499.00, 26, 13),
+(N'Barbie Dreamhouse Bebek Evi', 8999.00, 7, 13),
+
+-- 14. Otomotiv ve Motosiklet
+(N'Bosch Araç Ýçi Süpürge', 2799.00, 33, 14),
+(N'70mai Araç Ýçi Kamera', 4299.00, 18, 14),
+
+-- 15. Süpermarket ve Gýda
+(N'Mehmet Efendi Türk Kahvesi 250 gr', 289.90, 120, 15),
+(N'Tariþ Naturel Sýzma Zeytinyaðý 1 L', 649.90, 85, 15);
+
+
+
+----------------------------------------------------------------------------------------
+
+
+INSERT INTO [CommerceFlowDb].[dbo].[Products]
+(ProductName, ProductPrice, ProductStock, CategoryId)
+VALUES
+-- Bilgisayar ve Tablet (4 ürün)
+(N'Apple MacBook Air M3 13 Ýnç', 48999.00, 8, 1),
+(N'ASUS TUF Gaming A15 Dizüstü Bilgisayar', 42999.00, 12, 1),
+(N'Samsung Galaxy Tab S9 FE', 17999.00, 24, 1),
+(N'Logitech MX Master 3S Kablosuz Mouse', 4499.00, 38, 1),
+
+-- Cep Telefonu ve Aksesuarlarý (4 ürün)
+(N'Xiaomi Redmi Note 14 Pro 256 GB', 18999.00, 27, 2),
+(N'Samsung Galaxy A56 128 GB', 21999.00, 19, 2),
+(N'Anker 20000 mAh Powerbank', 2299.00, 56, 2),
+(N'Apple AirPods Pro 2', 10999.00, 33, 2),
+
+-- Televizyon ve Ses Sistemleri (3 ürün)
+(N'LG OLED 65 Ýnç Smart TV', 74999.00, 5, 3),
+(N'Sony WH-1000XM5 Kulaklýk', 13999.00, 18, 3),
+(N'JBL Bar 500 Soundbar', 19999.00, 11, 3),
+
+-- Beyaz Eþya (3 ürün)
+(N'Siemens iQ500 Bulaþýk Makinesi', 32999.00, 9, 4),
+(N'Beko 9 KG Kurutma Makinesi', 25999.00, 14, 4),
+(N'Bosch Serie 4 Derin Dondurucu', 23999.00, 7, 4),
+
+-- Küçük Ev Aletleri (4 ürün)
+(N'Dyson V12 Detect Slim Süpürge', 28999.00, 16, 5),
+(N'Philips LatteGo 5400 Kahve Makinesi', 27999.00, 13, 5),
+(N'Tefal OptiGrill Elektrikli Izgara', 8999.00, 22, 5),
+(N'KitchenAid Artisan Stand Mikser', 34999.00, 6, 5),
+
+-- Ev ve Yaþam (3 ürün)
+(N'English Home Bambu Banyo Seti', 1299.00, 48, 6),
+(N'Karaca BioGranite Tencere Seti', 5999.00, 29, 6),
+(N'Madame Coco Çift Kiþilik Yorgan', 2499.00, 36, 6),
+
+-- Mobilya ve Dekorasyon (3 ürün)
+(N'Bellona Altý Kapaklý Gardýrop', 28999.00, 4, 7),
+(N'Vivense Kitaplýk 5 Raflý', 3999.00, 23, 7),
+(N'IKEA Markus Ofis Koltuðu', 8999.00, 17, 7),
+
+-- Giyim ve Moda (4 ürün)
+(N'Nike Sportswear Erkek Eþofman Takýmý', 4299.00, 32, 8),
+(N'Adidas Essentials Kadýn Sweatshirt', 2199.00, 45, 8),
+(N'Mavi Erkek Slim Fit Gömlek', 1799.00, 51, 8),
+(N'Columbia Erkek Outdoor Mont', 8999.00, 16, 8),
+
+-- Ayakkabý ve Çanta (3 ürün)
+(N'New Balance 530 Spor Ayakkabý', 5499.00, 28, 9),
+(N'Puma Carina Kadýn Sneaker', 3499.00, 37, 9),
+(N'Samsonite Kabin Boy Valiz', 7999.00, 14, 9),
+
+-- Kozmetik ve Kiþisel Bakým (3 ürün)
+(N'Cerave Nemlendirici Krem 454 gr', 999.00, 65, 10),
+(N'Braun Silk Epil 9 Epilatör', 7499.00, 21, 10),
+(N'Loreal Paris Revitalift Serum', 849.00, 72, 10),
+
+-- Spor ve Outdoor (3 ürün)
+(N'Decathlon 20 KG Dambýl Seti', 3499.00, 34, 11),
+(N'Quechua 30 L Trekking Sýrt Çantasý', 2499.00, 42, 11),
+(N'Wilson NBA Basketbol Topu', 1899.00, 26, 11),
+
+-- Kitap ve Kýrtasiye (3 ürün)
+(N'Sapiens - Yuval Noah Harari', 459.00, 83, 12),
+(N'Kürk Mantolu Madonna - Sabahattin Ali', 179.00, 110, 12),
+(N'Moleskine Classic Defter', 999.00, 57, 12),
+
+-- Oyun ve Oyuncak (3 ürün)
+(N'LEGO City Polis Merkezi', 4999.00, 19, 13),
+(N'Hot Wheels 20li Araba Seti', 1799.00, 41, 13),
+(N'Fisher Price Eðitici Köpekçik', 2299.00, 35, 13),
+
+-- Otomotiv ve Motosiklet (3 ürün)
+(N'Xiaomi Taþýnabilir Hava Kompresörü', 2699.00, 39, 14),
+(N'Bosch Aerotwin Silecek Takýmý', 1199.00, 62, 14),
+(N'Baseus Araç Ýçi Telefon Tutucu', 699.00, 87, 14),
+
+-- Süpermarket ve Gýda (4 ürün)
+(N'Nutella Kakaolu Fýndýk Kremasý 750 gr', 299.90, 125, 15),
+(N'Çaykur Rize Turist Çayý 1 KG', 349.90, 140, 15),
+(N'Barilla Spaghetti Makarna 500 gr', 89.90, 180, 15),
+(N'Eti Lifalif Ýnce Öðütülmüþ Yulaf 500 gr', 119.90, 115, 15);
+
+----------------------------------------------------------------------------------------
+
+
+INSERT INTO [CommerceFlowDb].[dbo].[Products]
+(ProductName, ProductPrice, ProductStock, CategoryId)
+VALUES
+-- 81-82: Bilgisayar ve Tablet
+(N'HP Victus 16 Gaming Dizüstü Bilgisayar', 45999.00, 7, 1),
+(N'Apple Magic Keyboard Kablosuz Klavye', 5999.00, 18, 1),
+
+-- 83-84: Cep Telefonu ve Aksesuarlarý
+(N'Google Pixel 9 Pro 256 GB', 54999.00, 6, 2),
+(N'Samsung Galaxy Buds3 Pro', 7999.00, 24, 2),
+
+-- 85-86: Televizyon ve Ses Sistemleri
+(N'TCL 65 Ýnç QLED 4K Smart TV', 35999.00, 5, 3),
+(N'Marshall Emberton II Bluetooth Hoparlör', 8999.00, 17, 3),
+
+-- 87: Beyaz Eþya
+(N'LG 10 KG AI DD Çamaþýr Makinesi', 37999.00, 4, 4),
+
+-- 88: Küçük Ev Aletleri
+(N'Bissell SpotClean Pro Leke Temizleyici', 12999.00, 14, 5),
+
+-- 89: Ev ve Yaþam
+(N'Korkmaz 84 Parça Çatal Kaþýk Býçak Seti', 7499.00, 23, 6),
+
+-- 90: Mobilya ve Dekorasyon
+(N'IKEA MALM 4 Çekmeceli Þifonyer', 6999.00, 8, 7),
+
+-- 91-92: Giyim ve Moda
+(N'Tommy Hilfiger Erkek Polo Yaka Tiþört', 3499.00, 32, 8),
+(N'Columbia Kadýn Yaðmurluk', 6499.00, 12, 8),
+
+-- 93: Ayakkabý ve Çanta
+(N'Converse Chuck Taylor All Star', 2999.00, 45, 9),
+
+-- 94: Kozmetik ve Kiþisel Bakým
+(N'Dyson Supersonic Saç Kurutma Makinesi', 18999.00, 9, 10),
+
+-- 95: Spor ve Outdoor
+(N'Garmin Forerunner 255 GPS Spor Saati', 14999.00, 6, 11),
+
+-- 96: Kitap ve Kýrtasiye
+(N'Clean Code - Robert C. Martin', 1199.00, 38, 12),
+
+-- 97: Oyun ve Oyuncak
+(N'LEGO Star Wars Millennium Falcon', 6999.00, 5, 13),
+
+-- 98: Otomotiv ve Motosiklet
+(N'Michelin Dijital Lastik Basýnç Ölçer', 1499.00, 29, 14),
+
+-- 99-100: Süpermarket ve Gýda
+(N'Lavazza Qualita Rossa Kahve 1 KG', 1099.90, 58, 15),
+(N'Kelloggs Granola Kýrmýzý Meyveli 340 gr', 189.90, 92, 15);
+
+
+----------------------------------------------------------------------------------------
+
+
+INSERT INTO [CommerceFlowDb].[dbo].[Customers]
+(
+    CustomerName,
+    CustomerSurname,
+    CustomerEmail,
+    CustomerPhone,
+    District,
+    City
+)
+VALUES
+(N'Arda', N'Yalýn', N'arda.yalin@example.com', N'00000000001', N'Kadýköy', N'Ýstanbul'),
+(N'Elif', N'Doruk', N'elif.doruk@example.com', N'00000000002', N'Çankaya', N'Ankara'),
+(N'Deniz', N'Aksoy', N'deniz.aksoy@example.com', N'00000000003', N'Bornova', N'Ýzmir'),
+(N'Selin', N'Güner', N'selin.guner@example.com', N'00000000004', N'Nilüfer', N'Bursa'),
+(N'Kaan', N'Erden', N'kaan.erden@example.com', N'00000000005', N'Muratpaþa', N'Antalya'),
+(N'Derya', N'Ilgaz', N'derya.ilgaz@example.com', N'00000000006', N'Odunpazarý', N'Eskiþehir'),
+(N'Eren', N'Saygýn', N'eren.saygin@example.com', N'00000000007', N'Yeniþehir', N'Mersin'),
+(N'Aslý', N'Taner', N'asli.taner@example.com', N'00000000008', N'Atakum', N'Samsun'),
+(N'Bora', N'Özkan', N'bora.ozkan@example.com', N'00000000009', N'Melikgazi', N'Kayseri'),
+(N'Ýdil', N'Keskin', N'idil.keskin@example.com', N'00000000010', N'Konak', N'Ýzmir'),
+(N'Emir', N'Tunç', N'emir.tunc@example.com', N'00000000011', N'Üsküdar', N'Ýstanbul'),
+(N'Ceren', N'Aydýn', N'ceren.aydin@example.com', N'00000000012', N'Selçuklu', N'Konya'),
+(N'Baran', N'Yücel', N'baran.yucel@example.com', N'00000000013', N'Ortahisar', N'Trabzon'),
+(N'Ece', N'Altýn', N'ece.altin@example.com', N'00000000014', N'Þehitkamil', N'Gaziantep'),
+(N'Mert', N'Koral', N'mert.koral@example.com', N'00000000015', N'Pamukkale', N'Denizli'),
+(N'Naz', N'Erdem', N'naz.erdem@example.com', N'00000000016', N'Karþýyaka', N'Ýzmir'),
+(N'Ozan', N'Bilgin', N'ozan.bilgin@example.com', N'00000000017', N'Ýzmit', N'Kocaeli'),
+(N'Ýrem', N'Gökçe', N'irem.gokce@example.com', N'00000000018', N'Battalgazi', N'Malatya'),
+(N'Kerem', N'Baþar', N'kerem.basar@example.com', N'00000000019', N'Yakutiye', N'Erzurum'),
+(N'Lara', N'Sevinç', N'lara.sevinc@example.com', N'00000000020', N'Merkezefendi', N'Denizli');
+
+
+
+----------------------------------------------------------------------------------------
+
+
+USE CommerceFlowDb;
+GO
+
+;WITH Digits AS
+(
+    SELECT Number
+    FROM (VALUES
+        (0),(1),(2),(3),(4),
+        (5),(6),(7),(8),(9)
+    ) AS D(Number)
+),
+Numbers AS
+(
+    SELECT TOP (240)
+        ROW_NUMBER() OVER (
+            ORDER BY A.Number, B.Number, C.Number
+        ) AS RowNo
+    FROM Digits A
+    CROSS JOIN Digits B
+    CROSS JOIN Digits C
+),
+Customers AS
+(
+    SELECT
+        CustomerId,
+        ROW_NUMBER() OVER (ORDER BY CustomerId) AS RowNo
+    FROM dbo.Customers
+),
+Products AS
+(
+    SELECT
+        ProductId,
+        ProductPrice,
+        ROW_NUMBER() OVER (ORDER BY ProductId) AS RowNo
+    FROM dbo.Products
+),
+RecordCounts AS
+(
+    SELECT
+        (SELECT COUNT(*) FROM Customers) AS CustomerCount,
+        (SELECT COUNT(*) FROM Products) AS ProductCount
+),
+OrderData AS
+(
+    SELECT
+        C.CustomerId,
+        P.ProductId,
+        (N.RowNo % 4) + 1 AS OrderQuantity,
+        DATEADD(
+            HOUR,
+            (N.RowNo * 7) % 12,
+            DATEADD(
+                DAY,
+                -((N.RowNo * 17) % 180),
+                CAST('2026-11-18T08:00:00' AS DATETIME)
+            )
+        ) AS OrderDate,
+        N.RowNo
+    FROM Numbers N
+    CROSS JOIN RecordCounts RC
+    INNER JOIN Customers C
+        ON C.RowNo = ((N.RowNo * 7 - 1) % RC.CustomerCount) + 1
+    INNER JOIN Products P
+        ON P.RowNo = ((N.RowNo * 37 - 1) % RC.ProductCount) + 1
+)
+INSERT INTO dbo.Orders
+(
+    CustomerId,
+    ProductId,
+    OrderQuantity,
+    OrderTotalPrice,
+    OrderDate,
+    OrderStatus
+)
+SELECT
+    O.CustomerId,
+    O.ProductId,
+    O.OrderQuantity,
+    P.ProductPrice * O.OrderQuantity,
+    O.OrderDate,
+    CASE
+        WHEN O.RowNo % 11 = 0 THEN N'Ýptal Edildi'
+        WHEN O.OrderDate >= '2026-11-16' THEN N'Hazýrlanýyor'
+        WHEN O.OrderDate >= '2026-11-11' THEN N'Kargoda'
+        ELSE N'Teslim Edildi'
+    END
+FROM OrderData O
+INNER JOIN dbo.Products P
+    ON O.ProductId = P.ProductId;
+
+
+
+----------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------
