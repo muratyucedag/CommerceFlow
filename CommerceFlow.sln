@@ -17,8 +17,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Requirements", "Requirement
 		CodeWithChatGPT7.txt = CodeWithChatGPT7.txt
 		CodeWithChatGPT8.txt = CodeWithChatGPT8.txt
 		CodeWithChatGPT9.txt = CodeWithChatGPT9.txt
+		CustomerFinalCodes.txt = CustomerFinalCodes.txt
 		FinalConsoleCodes.txt = FinalConsoleCodes.txt
 		LaterWillUse.txt = LaterWillUse.txt
+		ProductFinalCodes.txt = ProductFinalCodes.txt
 		SQLQueryExamples.txt = SQLQueryExamples.txt
 	EndProjectSection
 EndProject

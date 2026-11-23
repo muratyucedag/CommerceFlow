@@ -9,5 +9,6 @@ namespace CommerceFlow.Business.Abstract
         void DeleteProduct(int id);
         List<Product> GetAllProducts();
         Product? GetProductById(int id);
+        List<Product> GetLowStockProducts();
     }
 }

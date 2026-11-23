@@ -334,13 +334,574 @@ void ShowCategoryMenu()
 
 
 -------------------------------------------------------------------------------
+
+
+using CommerceFlow.Business.Abstract;
+using CommerceFlow.ConsoleUI.Helpers;
+using CommerceFlow.Entities.Entities;
+
+namespace CommerceFlow.ConsoleUI.Screens
+{
+    public class CategoryScreens
+    {
+        private readonly ICategoryService _categoryService;
+
+        public CategoryScreens(ICategoryService categoryService)
+        {
+            _categoryService = categoryService;
+        }
+
+        public void ShowCategories()
+        {
+            ConsoleRestaurantDesign.WriteHeader("Kategori Listesi");
+
+            List<Category> categories =
+                _categoryService.GetAllCategories();
+
+            if (categories.Count == 0)
+            {
+                ConsoleRestaurantDesign.WriteInfo(
+                    "Kayýtlý kategori bulunamadý.");
+
+                ConsoleRestaurantDesign.WaitForKey();
+                return;
+            }
+
+            Console.ForegroundColor = ConsoleColor.Yellow;
+
+            Console.WriteLine("  ---------------------------------------------");
+            Console.WriteLine("  ID      KATEGORÝ ADI");
+            Console.WriteLine("  ---------------------------------------------");
+
+            Console.ResetColor();
+
+            foreach (Category category in categories)
+            {
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.Write($"  {category.CategoryId,-8}");
+
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.WriteLine(category.CategoryName);
+            }
+
+            Console.ResetColor();
+
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.WriteLine("  ---------------------------------------------");
+            Console.ResetColor();
+
+            ConsoleRestaurantDesign.WriteSuccess(
+                $"Toplam {categories.Count} kategori listelendi.");
+
+            ConsoleRestaurantDesign.WaitForKey();
+        }
+
+        public void ShowPlaceholder(string title)
+        {
+            ConsoleRestaurantDesign.WriteHeader(title);
+
+            ConsoleRestaurantDesign.WriteInfo(
+                "Bu iþlemin geliþtirilmesine daha sonra baþlanacak.");
+
+            ConsoleRestaurantDesign.WaitForKey();
+        }
+    }
+}
+
+
 -------------------------------------------------------------------------------
+
+
+using CommerceFlow.ConsoleUI.Helpers;
+using CommerceFlow.ConsoleUI.Screens;
+
+namespace CommerceFlow.ConsoleUI.Menus
+{
+    public class CategoryMenu
+    {
+        private readonly CategoryScreens _categoryScreens;
+
+        public CategoryMenu(CategoryScreens categoryScreens)
+        {
+            _categoryScreens = categoryScreens;
+        }
+
+        public void Show()
+        {
+            bool isRunning = true;
+
+            while (isRunning)
+            {
+                ConsoleRestaurantDesign.WriteHeader("Kategori Yönetimi");
+
+                ConsoleRestaurantDesign.WriteMenuItem(
+                    1, "Kategorileri Listele");
+
+                ConsoleRestaurantDesign.WriteMenuItem(
+                    2, "Kategori Detayýný Görüntüle");
+
+                ConsoleRestaurantDesign.WriteMenuItem(
+                    3, "Yeni Kategori Ekle");
+
+                ConsoleRestaurantDesign.WriteMenuItem(
+                    4, "Kategori Güncelle");
+
+                ConsoleRestaurantDesign.WriteMenuItem(
+                    5, "Kategori Sil");
+
+                ConsoleRestaurantDesign.WriteMenuItem(
+                    0, "Ana Menüye Dön");
+
+                Console.WriteLine();
+
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.Write("  Seçiminiz: ");
+                Console.ResetColor();
+
+                string? choice = Console.ReadLine();
+
+                switch (choice)
+                {
+                    case "1":
+                        _categoryScreens.ShowCategories();
+                        break;
+
+                    case "2":
+                        _categoryScreens.ShowPlaceholder(
+                            "Kategori Detayý");
+                        break;
+
+                    case "3":
+                        _categoryScreens.ShowPlaceholder(
+                            "Yeni Kategori Ekle");
+                        break;
+
+                    case "4":
+                        _categoryScreens.ShowPlaceholder(
+                            "Kategori Güncelle");
+                        break;
+
+                    case "5":
+                        _categoryScreens.ShowPlaceholder(
+                            "Kategori Sil");
+                        break;
+
+                    case "0":
+                        isRunning = false;
+                        break;
+
+                    default:
+                        ConsoleRestaurantDesign.WriteError(
+                            "Geçersiz seçim yaptýnýz.");
+
+                        ConsoleRestaurantDesign.WaitForKey();
+                        break;
+                }
+            }
+        }
+    }
+}
+
+
+
 -------------------------------------------------------------------------------
+
+
+using CommerceFlow.ConsoleUI.Helpers;
+
+namespace CommerceFlow.ConsoleUI.Menus
+{
+    public class MainMenu
+    {
+        private readonly CategoryMenu _categoryMenu;
+
+        public MainMenu(CategoryMenu categoryMenu)
+        {
+            _categoryMenu = categoryMenu;
+        }
+
+        public void Show()
+        {
+            bool isRunning = true;
+
+            while (isRunning)
+            {
+                ConsoleRestaurantDesign.WriteHeader("Ana Menü");
+
+                ConsoleRestaurantDesign.WriteMenuItem(1, "Ürün Ýþlemleri");
+                ConsoleRestaurantDesign.WriteMenuItem(2, "Kategori Ýþlemleri");
+                ConsoleRestaurantDesign.WriteMenuItem(3, "Müþteri Ýþlemleri");
+                ConsoleRestaurantDesign.WriteMenuItem(4, "Sipariþ Ýþlemleri");
+                ConsoleRestaurantDesign.WriteMenuItem(5, "Raporlar");
+                ConsoleRestaurantDesign.WriteMenuItem(0, "Çýkýþ");
+
+                Console.WriteLine();
+
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.Write("  Seçiminiz: ");
+                Console.ResetColor();
+
+                string? choice = Console.ReadLine();
+
+                switch (choice)
+                {
+                    case "1":
+                        ShowPlaceholder("Ürün Ýþlemleri");
+                        break;
+
+                    case "2":
+                        _categoryMenu.Show();
+                        break;
+
+                    case "3":
+                        ShowPlaceholder("Müþteri Ýþlemleri");
+                        break;
+
+                    case "4":
+                        ShowPlaceholder("Sipariþ Ýþlemleri");
+                        break;
+
+                    case "5":
+                        ShowPlaceholder("Raporlar");
+                        break;
+
+                    case "0":
+                        isRunning = false;
+                        break;
+
+                    default:
+                        ConsoleRestaurantDesign.WriteError(
+                            "Geçersiz seçim yaptýnýz.");
+
+                        ConsoleRestaurantDesign.WaitForKey();
+                        break;
+                }
+            }
+
+            Console.Clear();
+
+            ConsoleRestaurantDesign.WriteSuccess(
+                "CommerceFlow uygulamasýndan çýkýþ yapýldý.");
+        }
+
+        private void ShowPlaceholder(string title)
+        {
+            ConsoleRestaurantDesign.WriteHeader(title);
+
+            ConsoleRestaurantDesign.WriteInfo(
+                "Bu bölümün iþlemleri daha sonra eklenecek.");
+
+            ConsoleRestaurantDesign.WaitForKey();
+        }
+    }
+}
+
+
+
 -------------------------------------------------------------------------------
+
+
+using CommerceFlow.Business.Abstract;
+using CommerceFlow.Business.Concrete;
+using CommerceFlow.ConsoleUI.Menus;
+using CommerceFlow.ConsoleUI.Screens;
+using CommerceFlow.DataAccess.Interfaces;
+using CommerceFlow.DataAccess.Repositories;
+
+Console.Title = "CommerceFlow - E-Ticaret Yönetim Sistemi";
+
+// DataAccess
+ICategoryRepository categoryRepository = new CategoryRepository();
+
+// Business
+ICategoryService categoryService =
+    new CategoryManager(categoryRepository);
+
+// Presentation
+CategoryScreens categoryScreens =
+    new CategoryScreens(categoryService);
+
+CategoryMenu categoryMenu =
+    new CategoryMenu(categoryScreens);
+
+MainMenu mainMenu =
+    new MainMenu(categoryMenu);
+
+// Uygulamayý baþlat
+mainMenu.Show();
+
+
+
 -------------------------------------------------------------------------------
+
+
+public void AddCategory()
+{
+    ConsoleRestaurantDesign.WriteHeader("Yeni Kategori Ekle");
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Kategori Adý: ");
+    Console.ResetColor();
+
+    string? categoryName = Console.ReadLine();
+
+    if (string.IsNullOrWhiteSpace(categoryName))
+    {
+        ConsoleRestaurantDesign.WriteError(
+            "Kategori adý boþ býrakýlamaz.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    Category category = new Category
+    {
+        CategoryName = categoryName.Trim()
+    };
+
+    _categoryService.AddCategory(category);
+
+    ConsoleRestaurantDesign.WaitForKey();
+}
+
+
 -------------------------------------------------------------------------------
+
+
+public void ShowCategoryDetail()
+{
+    ConsoleRestaurantDesign.WriteHeader("Kategori Detayý");
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Kategori ID: ");
+    Console.ResetColor();
+
+    string? input = Console.ReadLine();
+
+    if (!int.TryParse(input, out int categoryId) || categoryId <= 0)
+    {
+        ConsoleRestaurantDesign.WriteError(
+            "Geçerli bir kategori ID deðeri giriniz.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    Category? category = _categoryService.GetCategoryById(categoryId);
+
+    if (category == null)
+    {
+        ConsoleRestaurantDesign.WriteError(
+            "Belirtilen ID deðerine ait kategori bulunamadý.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    Console.WriteLine();
+
+    Console.ForegroundColor = ConsoleColor.Yellow;
+    Console.WriteLine("  ---------------------------------------------");
+    Console.WriteLine("                 KATEGORÝ BÝLGÝLERÝ");
+    Console.WriteLine("  ---------------------------------------------");
+    Console.ResetColor();
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Kategori ID   : ");
+    Console.ForegroundColor = ConsoleColor.White;
+    Console.WriteLine(category.CategoryId);
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Kategori Adý  : ");
+    Console.ForegroundColor = ConsoleColor.White;
+    Console.WriteLine(category.CategoryName);
+
+    Console.ResetColor();
+
+    Console.WriteLine();
+
+    ConsoleRestaurantDesign.WriteSuccess(
+        "Kategori bilgileri baþarýyla getirildi.");
+
+    ConsoleRestaurantDesign.WaitForKey();
+}
+
 -------------------------------------------------------------------------------
+
+
+public void DeleteCategory()
+{
+    ConsoleRestaurantDesign.WriteHeader("Kategori Silme");
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Silinecek Kategori ID: ");
+    Console.ResetColor();
+
+    string? input = Console.ReadLine();
+
+    if (!int.TryParse(input, out int categoryId) || categoryId <= 0)
+    {
+        ConsoleRestaurantDesign.WriteError(
+            "Geçerli bir kategori ID deðeri giriniz.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    Category? category = _categoryService.GetCategoryById(categoryId);
+
+    if (category == null)
+    {
+        ConsoleRestaurantDesign.WriteError(
+            "Silinecek kategori bulunamadý.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    Console.WriteLine();
+
+    Console.ForegroundColor = ConsoleColor.Yellow;
+    Console.WriteLine("  ---------------------------------------------");
+    Console.WriteLine("              SÝLÝNECEK KATEGORÝ");
+    Console.WriteLine("  ---------------------------------------------");
+    Console.ResetColor();
+
+    Console.WriteLine($"  Kategori ID  : {category.CategoryId}");
+    Console.WriteLine($"  Kategori Adý : {category.CategoryName}");
+
+    Console.WriteLine();
+
+    Console.ForegroundColor = ConsoleColor.Red;
+    Console.Write("  Bu kategoriyi silmek istediðinize emin misiniz? (E/H): ");
+    Console.ResetColor();
+
+    string? confirmation = Console.ReadLine();
+
+    if (!string.Equals(confirmation?.Trim(), "E",
+        StringComparison.OrdinalIgnoreCase))
+    {
+        ConsoleRestaurantDesign.WriteInfo(
+            "Kategori silme iþlemi iptal edildi.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    try
+    {
+        _categoryService.DeleteCategory(categoryId);
+    }
+    catch (Microsoft.EntityFrameworkCore.DbUpdateException)
+    {
+        ConsoleRestaurantDesign.WriteError(
+            "Kategori silinemedi. Ýliþkili ürün kayýtlarý bulunuyor olabilir.");
+    }
+
+    ConsoleRestaurantDesign.WaitForKey();
+}
+
+
 -------------------------------------------------------------------------------
+
+
+public void UpdateCategory()
+{
+    ConsoleRestaurantDesign.WriteHeader("Kategori Güncelleme");
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Güncellenecek Kategori ID: ");
+    Console.ResetColor();
+
+    string? input = Console.ReadLine();
+
+    if (!int.TryParse(input, out int categoryId) || categoryId <= 0)
+    {
+        ConsoleRestaurantDesign.WriteError(
+            "Geçerli bir kategori ID deðeri giriniz.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    Category? category = _categoryService.GetCategoryById(categoryId);
+
+    if (category == null)
+    {
+        ConsoleRestaurantDesign.WriteError(
+            "Güncellenecek kategori bulunamadý.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    Console.WriteLine();
+
+    Console.ForegroundColor = ConsoleColor.Yellow;
+    Console.WriteLine("  ---------------------------------------------");
+    Console.WriteLine("             MEVCUT KATEGORÝ BÝLGÝLERÝ");
+    Console.WriteLine("  ---------------------------------------------");
+    Console.ResetColor();
+
+    Console.WriteLine($"  Kategori ID  : {category.CategoryId}");
+    Console.WriteLine($"  Kategori Adý : {category.CategoryName}");
+
+    Console.WriteLine();
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Yeni Kategori Adý: ");
+    Console.ResetColor();
+
+    string? newCategoryName = Console.ReadLine();
+
+    if (string.IsNullOrWhiteSpace(newCategoryName))
+    {
+        ConsoleRestaurantDesign.WriteError(
+            "Yeni kategori adý boþ býrakýlamaz.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    string oldCategoryName = category.CategoryName;
+
+    category.CategoryName = newCategoryName.Trim();
+
+    Console.WriteLine();
+
+    Console.ForegroundColor = ConsoleColor.Yellow;
+    Console.WriteLine("  -------- GÜNCELLEME ÖZETÝ --------");
+    Console.ResetColor();
+
+    Console.WriteLine($"  Eski Kategori Adý : {oldCategoryName}");
+    Console.WriteLine($"  Yeni Kategori Adý : {category.CategoryName}");
+
+    Console.WriteLine();
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Deðiþiklikleri kaydetmek istiyor musunuz? (E/H): ");
+    Console.ResetColor();
+
+    string? confirmation = Console.ReadLine();
+
+    if (!string.Equals(
+        confirmation?.Trim(),
+        "E",
+        StringComparison.OrdinalIgnoreCase))
+    {
+        ConsoleRestaurantDesign.WriteInfo(
+            "Kategori güncelleme iþlemi iptal edildi.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    _categoryService.UpdateCategory(category);
+
+    ConsoleRestaurantDesign.WaitForKey();
+}
+
+
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------

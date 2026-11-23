@@ -1,10 +1,11 @@
 ﻿
+using CommerceFlow.Business.Abstract;
 using CommerceFlow.DataAccess.Interfaces;
 using CommerceFlow.Entities.Entities;
 
 namespace CommerceFlow.Business.Concrete
 {
-    public class ProductManager
+    public class ProductManager : IProductService
     {
         private readonly IProductRepository _productRepository;
         public ProductManager(IProductRepository productRepository)
@@ -98,6 +99,11 @@ namespace CommerceFlow.Business.Concrete
             }
 
             return _productRepository.GetById(id);
+        }
+
+        public List<Product> GetLowStockProducts()
+        {
+            return _productRepository.GetLowStockProducts();
         }
     }
 }

@@ -1,0 +1,759 @@
+--------------------------------------------------------------------------------------------
+
+
+using CommerceFlow.Business.Abstract;
+using CommerceFlow.ConsoleUI.Helpers;
+using CommerceFlow.Entities.Entities;
+
+namespace CommerceFlow.ConsoleUI.Screens
+{
+    public class ProductScreens
+    {
+        private readonly IProductService _productService;
+
+        public ProductScreens(IProductService productService)
+        {
+            _productService = productService;
+        }
+
+        public void ShowProducts()
+        {
+            ConsoleRestaurantDesign.WriteHeader("Ürün Listesi");
+
+            List<Product> products =
+                _productService.GetAllProducts();
+
+            if (products.Count == 0)
+            {
+                ConsoleRestaurantDesign.WriteInfo(
+                    "Kayýtlý ürün bulunamadý.");
+
+                ConsoleRestaurantDesign.WaitForKey();
+                return;
+            }
+
+            Console.ForegroundColor = ConsoleColor.Yellow;
+
+            Console.WriteLine(
+                $"  {"ID",-5} {"ÜRÜN ADI",-35} {"FÝYAT",-15} {"STOK",-8} {"KATEGORÝ ID",-12}");
+
+            Console.WriteLine(new string('-', 90));
+
+            Console.ResetColor();
+
+            foreach (Product product in products)
+            {
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.Write($"  {product.ProductId,-5}");
+
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.Write($"{product.ProductName,-35}");
+
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.Write($"{product.ProductPrice, -15:N2}");
+
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.Write($"{product.ProductStock,-8}");
+
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.WriteLine($"{product.CategoryId,-12}");
+            }
+
+            Console.ResetColor();
+
+            Console.WriteLine(new string('-', 90));
+
+            ConsoleRestaurantDesign.WriteSuccess(
+                $"Toplam {products.Count} ürün listelendi.");
+
+            ConsoleRestaurantDesign.WaitForKey();
+        }
+
+        public void ShowPlaceholder(string title)
+        {
+            ConsoleRestaurantDesign.WriteHeader(title);
+
+            ConsoleRestaurantDesign.WriteInfo(
+                "Bu iþlem daha sonra geliþtirilecek.");
+
+            ConsoleRestaurantDesign.WaitForKey();
+        }
+    }
+}
+
+
+
+--------------------------------------------------------------------------------------------
+
+
+using CommerceFlow.ConsoleUI.Helpers;
+using CommerceFlow.ConsoleUI.Screens;
+
+namespace CommerceFlow.ConsoleUI.Menus
+{
+    public class ProductMenu
+    {
+        private readonly ProductScreens _productScreens;
+
+        public ProductMenu(ProductScreens productScreens)
+        {
+            _productScreens = productScreens;
+        }
+
+        public void Show()
+        {
+            bool isRunning = true;
+
+            while (isRunning)
+            {
+                ConsoleRestaurantDesign.WriteHeader("Ürün Yönetimi");
+
+                ConsoleRestaurantDesign.WriteMenuItem(
+                    1, "Ürünleri Listele");
+
+                ConsoleRestaurantDesign.WriteMenuItem(
+                    2, "Ürün Detayýný Görüntüle");
+
+                ConsoleRestaurantDesign.WriteMenuItem(
+                    3, "Yeni Ürün Ekle");
+
+                ConsoleRestaurantDesign.WriteMenuItem(
+                    4, "Ürün Güncelle");
+
+                ConsoleRestaurantDesign.WriteMenuItem(
+                    5, "Ürün Sil");
+
+                ConsoleRestaurantDesign.WriteMenuItem(
+                    6, "Düþük Stoklu Ürünleri Listele");
+
+                ConsoleRestaurantDesign.WriteMenuItem(
+                    0, "Ana Menüye Dön");
+
+                Console.WriteLine();
+
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.Write("  Seçiminiz: ");
+                Console.ResetColor();
+
+                string? choice = Console.ReadLine();
+
+                switch (choice)
+                {
+                    case "1":
+                        _productScreens.ShowProducts();
+                        break;
+
+                    case "2":
+                        _productScreens.ShowPlaceholder("Ürün Detayý");
+                        break;
+
+                    case "3":
+                        _productScreens.ShowPlaceholder("Yeni Ürün Ekle");
+                        break;
+
+                    case "4":
+                        _productScreens.ShowPlaceholder("Ürün Güncelle");
+                        break;
+
+                    case "5":
+                        _productScreens.ShowPlaceholder("Ürün Sil");
+                        break;
+
+                    case "6":
+                        _productScreens.ShowPlaceholder(
+                            "Düþük Stoklu Ürünler");
+                        break;
+
+                    case "0":
+                        isRunning = false;
+                        break;
+
+                    default:
+                        ConsoleRestaurantDesign.WriteError(
+                            "Geçersiz seçim yaptýnýz.");
+
+                        ConsoleRestaurantDesign.WaitForKey();
+                        break;
+                }
+            }
+        }
+    }
+}
+
+
+--------------------------------------------------------------------------------------------
+
+// PRODUCT - DATA ACCESS
+IProductRepository productRepository = new ProductRepository();
+
+// PRODUCT - BUSINESS
+IProductService productService =
+    new ProductManager(productRepository);
+
+// PRODUCT - PRESENTATION
+ProductScreens productScreens =
+    new ProductScreens(productService);
+
+ProductMenu productMenu =
+    new ProductMenu(productScreens);
+
+
+--------------------------------------------------------------------------------------------
+
+
+public void AddProduct()
+{
+    ConsoleRestaurantDesign.WriteHeader("Yeni Ürün Ekle");
+
+    List<Category> categories = _categoryService.GetAllCategories();
+
+    if (categories.Count == 0)
+    {
+        ConsoleRestaurantDesign.WriteError(
+            "Ürün eklemek için öncelikle kategori oluþturmalýsýnýz.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    Console.ForegroundColor = ConsoleColor.Yellow;
+    Console.WriteLine("  -------- MEVCUT KATEGORÝLER --------");
+    Console.ResetColor();
+
+    foreach (Category category in categories)
+    {
+        Console.ForegroundColor = ConsoleColor.Cyan;
+        Console.Write($"  [{category.CategoryId}] ");
+
+        Console.ForegroundColor = ConsoleColor.White;
+        Console.WriteLine(category.CategoryName);
+    }
+
+    Console.ResetColor();
+    Console.WriteLine();
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Ürün Adý       : ");
+    Console.ResetColor();
+    string? productName = Console.ReadLine();
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Ürün Fiyatý    : ");
+    Console.ResetColor();
+    string? priceInput = Console.ReadLine();
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Ürün Stok      : ");
+    Console.ResetColor();
+    string? stockInput = Console.ReadLine();
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Kategori ID    : ");
+    Console.ResetColor();
+    string? categoryInput = Console.ReadLine();
+
+    if (string.IsNullOrWhiteSpace(productName))
+    {
+        ConsoleRestaurantDesign.WriteError(
+            "Ürün adý boþ býrakýlamaz.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    if (!decimal.TryParse(priceInput, out decimal productPrice)
+        || productPrice <= 0)
+    {
+        ConsoleRestaurantDesign.WriteError(
+            "Geçerli bir ürün fiyatý giriniz.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    if (!int.TryParse(stockInput, out int productStock)
+        || productStock < 0)
+    {
+        ConsoleRestaurantDesign.WriteError(
+            "Geçerli bir stok miktarý giriniz.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    if (!int.TryParse(categoryInput, out int categoryId)
+        || categoryId <= 0)
+    {
+        ConsoleRestaurantDesign.WriteError(
+            "Geçerli bir kategori ID deðeri giriniz.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    Category? selectedCategory =
+        categories.FirstOrDefault(x => x.CategoryId == categoryId);
+
+    if (selectedCategory == null)
+    {
+        ConsoleRestaurantDesign.WriteError(
+            "Seçilen kategori bulunamadý.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    Product product = new Product
+    {
+        ProductName = productName.Trim(),
+        ProductPrice = productPrice,
+        ProductStock = productStock,
+        CategoryId = categoryId
+    };
+
+    _productService.AddProduct(product);
+
+    ConsoleRestaurantDesign.WaitForKey();
+}
+
+--------------------------------------------------------------------------------------------
+
+
+public void ShowProductDetail()
+{
+    ConsoleRestaurantDesign.WriteHeader("Ürün Detayý");
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Ürün ID: ");
+    Console.ResetColor();
+
+    string? input = Console.ReadLine();
+
+    if (!int.TryParse(input, out int productId) || productId <= 0)
+    {
+        ConsoleRestaurantDesign.WriteError(
+            "Geçerli bir ürün ID deðeri giriniz.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    Product? product = _productService.GetProductById(productId);
+
+    if (product == null)
+    {
+        ConsoleRestaurantDesign.WriteError(
+            "Belirtilen ID deðerine ait ürün bulunamadý.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    Category? category =
+        _categoryService.GetCategoryById(product.CategoryId);
+
+    Console.WriteLine();
+
+    Console.ForegroundColor = ConsoleColor.Yellow;
+    Console.WriteLine("  ------------------------------------------------");
+    Console.WriteLine("                    ÜRÜN BÝLGÝLERÝ");
+    Console.WriteLine("  ------------------------------------------------");
+    Console.ResetColor();
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Ürün ID        : ");
+    Console.ForegroundColor = ConsoleColor.White;
+    Console.WriteLine(product.ProductId);
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Ürün Adý       : ");
+    Console.ForegroundColor = ConsoleColor.White;
+    Console.WriteLine(product.ProductName);
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Ürün Fiyatý    : ");
+    Console.ForegroundColor = ConsoleColor.Green;
+    Console.WriteLine($"{product.ProductPrice:N2} TL");
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Stok Miktarý   : ");
+    Console.ForegroundColor = ConsoleColor.White;
+    Console.WriteLine(product.ProductStock);
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Kategori ID    : ");
+    Console.ForegroundColor = ConsoleColor.White;
+    Console.WriteLine(product.CategoryId);
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Kategori Adý   : ");
+    Console.ForegroundColor = ConsoleColor.White;
+    Console.WriteLine(category?.CategoryName ?? "Kategori bulunamadý");
+
+    Console.ResetColor();
+
+    Console.WriteLine();
+
+    ConsoleRestaurantDesign.WriteSuccess(
+        "Ürün bilgileri baþarýyla getirildi.");
+
+    ConsoleRestaurantDesign.WaitForKey();
+}
+
+
+--------------------------------------------------------------------------------------------
+
+
+public void DeleteProduct()
+{
+    ConsoleRestaurantDesign.WriteHeader("Ürün Silme");
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Silinecek Ürün ID: ");
+    Console.ResetColor();
+
+    string? input = Console.ReadLine();
+
+    if (!int.TryParse(input, out int productId) || productId <= 0)
+    {
+        ConsoleRestaurantDesign.WriteError(
+            "Geçerli bir ürün ID deðeri giriniz.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    Product? product = _productService.GetProductById(productId);
+
+    if (product == null)
+    {
+        ConsoleRestaurantDesign.WriteError(
+            "Silinecek ürün bulunamadý.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    Console.WriteLine();
+
+    Console.ForegroundColor = ConsoleColor.Yellow;
+    Console.WriteLine("  ---------------------------------------------");
+    Console.WriteLine("                SÝLÝNECEK ÜRÜN");
+    Console.WriteLine("  ---------------------------------------------");
+    Console.ResetColor();
+
+    Console.WriteLine($"  Ürün ID     : {product.ProductId}");
+    Console.WriteLine($"  Ürün Adý    : {product.ProductName}");
+    Console.WriteLine($"  Ürün Fiyatý : {product.ProductPrice:N2} TL");
+    Console.WriteLine($"  Stok Miktarý: {product.ProductStock}");
+    Console.WriteLine($"  Kategori ID : {product.CategoryId}");
+
+    Console.WriteLine();
+
+    Console.ForegroundColor = ConsoleColor.Red;
+    Console.Write("  Bu ürünü silmek istediðinize emin misiniz? (E/H): ");
+    Console.ResetColor();
+
+    string? confirmation = Console.ReadLine();
+
+    if (!string.Equals(
+        confirmation?.Trim(),
+        "E",
+        StringComparison.OrdinalIgnoreCase))
+    {
+        ConsoleRestaurantDesign.WriteInfo(
+            "Ürün silme iþlemi iptal edildi.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    try
+    {
+        _productService.DeleteProduct(productId);
+    }
+    catch (Microsoft.EntityFrameworkCore.DbUpdateException)
+    {
+        ConsoleRestaurantDesign.WriteError(
+            "Ürün silinemedi. Ürüne ait sipariþ kayýtlarý bulunuyor olabilir.");
+    }
+
+    ConsoleRestaurantDesign.WaitForKey();
+}
+
+
+
+--------------------------------------------------------------------------------------------
+
+
+public void UpdateProduct()
+{
+    ConsoleRestaurantDesign.WriteHeader("Ürün Güncelleme");
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Güncellenecek Ürün ID: ");
+    Console.ResetColor();
+
+    string? input = Console.ReadLine();
+
+    if (!int.TryParse(input, out int productId) || productId <= 0)
+    {
+        ConsoleRestaurantDesign.WriteError(
+            "Geçerli bir ürün ID deðeri giriniz.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    Product? product = _productService.GetProductById(productId);
+
+    if (product == null)
+    {
+        ConsoleRestaurantDesign.WriteError(
+            "Güncellenecek ürün bulunamadý.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    Category? currentCategory =
+        _categoryService.GetCategoryById(product.CategoryId);
+
+    Console.WriteLine();
+
+    Console.ForegroundColor = ConsoleColor.Yellow;
+    Console.WriteLine("  ---------------------------------------------");
+    Console.WriteLine("              MEVCUT ÜRÜN BÝLGÝLERÝ");
+    Console.WriteLine("  ---------------------------------------------");
+    Console.ResetColor();
+
+    Console.WriteLine($"  Ürün ID     : {product.ProductId}");
+    Console.WriteLine($"  Ürün Adý    : {product.ProductName}");
+    Console.WriteLine($"  Ürün Fiyatý : {product.ProductPrice:N2} TL");
+    Console.WriteLine($"  Stok Miktarý: {product.ProductStock}");
+    Console.WriteLine($"  Kategori    : {currentCategory?.CategoryName ?? "Bulunamadý"}");
+
+    Console.WriteLine();
+
+    ConsoleRestaurantDesign.WriteInfo(
+        "Deðiþtirmek istemediðiniz alanlarý boþ býrakabilirsiniz.");
+
+    Console.WriteLine();
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Yeni Ürün Adý    : ");
+    Console.ResetColor();
+    string? name = Console.ReadLine();
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Yeni Ürün Fiyatý : ");
+    Console.ResetColor();
+    string? priceInput = Console.ReadLine();
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Yeni Stok Miktarý: ");
+    Console.ResetColor();
+    string? stockInput = Console.ReadLine();
+
+    Console.WriteLine();
+
+    Console.ForegroundColor = ConsoleColor.Yellow;
+    Console.WriteLine("  -------- MEVCUT KATEGORÝLER --------");
+    Console.ResetColor();
+
+    List<Category> categories = _categoryService.GetAllCategories();
+
+    foreach (Category category in categories)
+    {
+        Console.ForegroundColor = ConsoleColor.Cyan;
+        Console.Write($"  [{category.CategoryId}] ");
+
+        Console.ForegroundColor = ConsoleColor.White;
+        Console.WriteLine(category.CategoryName);
+    }
+
+    Console.ResetColor();
+
+    Console.WriteLine();
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Yeni Kategori ID : ");
+    Console.ResetColor();
+    string? categoryInput = Console.ReadLine();
+
+    // Eski bilgileri saklayalým.
+    string oldName = product.ProductName;
+    decimal oldPrice = product.ProductPrice;
+    int oldStock = product.ProductStock;
+    int oldCategoryId = product.CategoryId;
+
+    // Yeni deðerleri önce geçici deðiþkenlere alalým.
+    string newName = product.ProductName;
+    decimal newPrice = product.ProductPrice;
+    int newStock = product.ProductStock;
+    int newCategoryId = product.CategoryId;
+
+    if (!string.IsNullOrWhiteSpace(name))
+    {
+        newName = name.Trim();
+    }
+
+    if (!string.IsNullOrWhiteSpace(priceInput))
+    {
+        if (!decimal.TryParse(priceInput, out newPrice) || newPrice <= 0)
+        {
+            ConsoleRestaurantDesign.WriteError(
+                "Geçerli bir ürün fiyatý giriniz.");
+
+            ConsoleRestaurantDesign.WaitForKey();
+            return;
+        }
+    }
+
+    if (!string.IsNullOrWhiteSpace(stockInput))
+    {
+        if (!int.TryParse(stockInput, out newStock) || newStock < 0)
+        {
+            ConsoleRestaurantDesign.WriteError(
+                "Geçerli bir stok miktarý giriniz.");
+
+            ConsoleRestaurantDesign.WaitForKey();
+            return;
+        }
+    }
+
+    if (!string.IsNullOrWhiteSpace(categoryInput))
+    {
+        if (!int.TryParse(categoryInput, out newCategoryId) ||
+            newCategoryId <= 0)
+        {
+            ConsoleRestaurantDesign.WriteError(
+                "Geçerli bir kategori ID deðeri giriniz.");
+
+            ConsoleRestaurantDesign.WaitForKey();
+            return;
+        }
+
+        if (!categories.Any(x => x.CategoryId == newCategoryId))
+        {
+            ConsoleRestaurantDesign.WriteError(
+                "Seçilen kategori bulunamadý.");
+
+            ConsoleRestaurantDesign.WaitForKey();
+            return;
+        }
+    }
+
+    Console.WriteLine();
+
+    Console.ForegroundColor = ConsoleColor.Yellow;
+    Console.WriteLine("  -------------- GÜNCELLEME ÖZETÝ --------------");
+    Console.ResetColor();
+
+    Console.WriteLine($"  Ürün Adý    : {oldName} -> {newName}");
+    Console.WriteLine($"  Ürün Fiyatý : {oldPrice:N2} -> {newPrice:N2} TL");
+    Console.WriteLine($"  Stok Miktarý: {oldStock} -> {newStock}");
+    Console.WriteLine($"  Kategori ID : {oldCategoryId} -> {newCategoryId}");
+
+    Console.WriteLine();
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Deðiþiklikleri kaydetmek istiyor musunuz? (E/H): ");
+    Console.ResetColor();
+
+    string? confirmation = Console.ReadLine();
+
+    if (!string.Equals(
+        confirmation?.Trim(),
+        "E",
+        StringComparison.OrdinalIgnoreCase))
+    {
+        ConsoleRestaurantDesign.WriteInfo(
+            "Ürün güncelleme iþlemi iptal edildi.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    product.ProductName = newName;
+    product.ProductPrice = newPrice;
+    product.ProductStock = newStock;
+    product.CategoryId = newCategoryId;
+
+    _productService.UpdateProduct(product);
+
+    ConsoleRestaurantDesign.WaitForKey();
+}
+
+
+--------------------------------------------------------------------------------------------
+
+
+public void ShowLowStockProducts()
+{
+    ConsoleRestaurantDesign.WriteHeader("Düþük Stoklu Ürünler");
+
+    List<Product> products =
+        _productService.GetLowStockProducts();
+
+    if (products.Count == 0)
+    {
+        ConsoleRestaurantDesign.WriteSuccess(
+            "Düþük stoklu ürün bulunamadý.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    Console.ForegroundColor = ConsoleColor.Yellow;
+
+    Console.WriteLine(
+        $"  {"ID",-6} {"ÜRÜN ADI",-35} {"FÝYAT",-15} {"STOK",-10}");
+
+    Console.WriteLine(new string('-', 75));
+
+    Console.ResetColor();
+
+    foreach (Product product in products)
+    {
+        Console.ForegroundColor = ConsoleColor.Cyan;
+        Console.Write($"  {product.ProductId,-6}");
+
+        Console.ForegroundColor = ConsoleColor.White;
+        Console.Write($"{product.ProductName,-35}");
+
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.Write($"{product.ProductPrice,-15:N2}");
+
+        if (product.ProductStock == 0)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+        }
+        else
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+        }
+
+        Console.WriteLine($"{product.ProductStock,-10}");
+    }
+
+    Console.ResetColor();
+
+    Console.WriteLine(new string('-', 75));
+    Console.WriteLine();
+
+    int outOfStockCount =
+        products.Count(x => x.ProductStock == 0);
+
+    ConsoleRestaurantDesign.WriteInfo(
+        $"Düþük stoklu ürün sayýsý: {products.Count}");
+
+    ConsoleRestaurantDesign.WriteError(
+        $"Stoðu tükenen ürün sayýsý: {outOfStockCount}");
+
+    ConsoleRestaurantDesign.WaitForKey();
+}
+
+
+--------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------

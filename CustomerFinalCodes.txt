@@ -1,0 +1,731 @@
+---------------------------------------------------------------------------------
+
+
+using CommerceFlow.Business.Abstract;
+using CommerceFlow.ConsoleUI.Helpers;
+using CommerceFlow.Entities.Entities;
+
+namespace CommerceFlow.ConsoleUI.Screens
+{
+    public class CustomerScreens
+    {
+        private readonly ICustomerService _customerService;
+
+        public CustomerScreens(ICustomerService customerService)
+        {
+            _customerService = customerService;
+        }
+
+        public void ShowCustomers()
+        {
+            ConsoleRestaurantDesign.WriteHeader("Müþteri Listesi");
+
+            List<Customer> customers =
+                _customerService.GetAllCustomers();
+
+            if (customers.Count == 0)
+            {
+                ConsoleRestaurantDesign.WriteInfo(
+                    "Kayýtlý müþteri bulunamadý.");
+
+                ConsoleRestaurantDesign.WaitForKey();
+                return;
+            }
+
+            Console.ForegroundColor = ConsoleColor.Yellow;
+
+            Console.WriteLine(
+                $"  {"ID",-5} {"AD SOYAD",-24} {"E-POSTA",-32} {"ÞEHÝR",-18}");
+
+            Console.WriteLine(new string('-', 85));
+
+            Console.ResetColor();
+
+            foreach (Customer customer in customers)
+            {
+                string fullName =
+                    customer.CustomerName + " " + customer.CustomerSurname;
+
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.Write($"  {customer.CustomerId,-5}");
+
+                Console.ForegroundColor = ConsoleColor.White;
+
+                Console.WriteLine(
+                    $" {fullName,-24} " +
+                    $"{customer.CustomerEmail,-32} " +
+                    $"{customer.City,-18}");
+            }
+
+            Console.ResetColor();
+
+            Console.WriteLine(new string('-', 85));
+
+            ConsoleRestaurantDesign.WriteSuccess(
+                $"Toplam {customers.Count} müþteri listelendi.");
+
+            ConsoleRestaurantDesign.WaitForKey();
+        }
+
+        public void ShowPlaceholder(string title)
+        {
+            ConsoleRestaurantDesign.WriteHeader(title);
+
+            ConsoleRestaurantDesign.WriteInfo(
+                "Bu iþlem daha sonra geliþtirilecek.");
+
+            ConsoleRestaurantDesign.WaitForKey();
+        }
+    }
+}
+
+
+
+---------------------------------------------------------------------------------
+
+
+using CommerceFlow.ConsoleUI.Helpers;
+using CommerceFlow.ConsoleUI.Screens;
+
+namespace CommerceFlow.ConsoleUI.Menus
+{
+    public class CustomerMenu
+    {
+        private readonly CustomerScreens _customerScreens;
+
+        public CustomerMenu(CustomerScreens customerScreens)
+        {
+            _customerScreens = customerScreens;
+        }
+
+        public void Show()
+        {
+            bool isRunning = true;
+
+            while (isRunning)
+            {
+                ConsoleRestaurantDesign.WriteHeader("Müþteri Yönetimi");
+
+                ConsoleRestaurantDesign.WriteMenuItem(
+                    1, "Müþterileri Listele");
+
+                ConsoleRestaurantDesign.WriteMenuItem(
+                    2, "Müþteri Detayýný Görüntüle");
+
+                ConsoleRestaurantDesign.WriteMenuItem(
+                    3, "Yeni Müþteri Ekle");
+
+                ConsoleRestaurantDesign.WriteMenuItem(
+                    4, "Müþteri Güncelle");
+
+                ConsoleRestaurantDesign.WriteMenuItem(
+                    5, "Müþteri Sil");
+
+                ConsoleRestaurantDesign.WriteMenuItem(
+                    6, "E-Posta Adresiyle Müþteri Ara");
+
+                ConsoleRestaurantDesign.WriteMenuItem(
+                    0, "Ana Menüye Dön");
+
+                Console.WriteLine();
+
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.Write("  Seçiminiz: ");
+                Console.ResetColor();
+
+                string? choice = Console.ReadLine();
+
+                switch (choice)
+                {
+                    case "1":
+                        _customerScreens.ShowCustomers();
+                        break;
+
+                    case "2":
+                        _customerScreens.ShowPlaceholder("Müþteri Detayý");
+                        break;
+
+                    case "3":
+                        _customerScreens.ShowPlaceholder("Yeni Müþteri Ekle");
+                        break;
+
+                    case "4":
+                        _customerScreens.ShowPlaceholder("Müþteri Güncelle");
+                        break;
+
+                    case "5":
+                        _customerScreens.ShowPlaceholder("Müþteri Sil");
+                        break;
+
+                    case "6":
+                        _customerScreens.ShowPlaceholder(
+                            "E-Posta Adresiyle Müþteri Ara");
+                        break;
+
+                    case "0":
+                        isRunning = false;
+                        break;
+
+                    default:
+                        ConsoleRestaurantDesign.WriteError(
+                            "Geçersiz seçim yaptýnýz.");
+
+                        ConsoleRestaurantDesign.WaitForKey();
+                        break;
+                }
+            }
+        }
+    }
+}
+
+
+
+---------------------------------------------------------------------------------
+
+
+using CommerceFlow.Business.Abstract;
+using CommerceFlow.Business.Concrete;
+using CommerceFlow.ConsoleUI.Menus;
+using CommerceFlow.ConsoleUI.Screens;
+using CommerceFlow.DataAccess.Interfaces;
+using CommerceFlow.DataAccess.Repositories;
+
+Console.Title = "CommerceFlow - E-Ticaret Yönetim Sistemi";
+
+// CATEGORY - DATA ACCESS
+ICategoryRepository categoryRepository = new CategoryRepository();
+
+// CATEGORY - BUSINESS
+ICategoryService categoryService =
+    new CategoryManager(categoryRepository);
+
+// CATEGORY - PRESENTATION
+CategoryScreens categoryScreens =
+    new CategoryScreens(categoryService);
+
+CategoryMenu categoryMenu =
+    new CategoryMenu(categoryScreens);
+
+
+// CUSTOMER - DATA ACCESS
+ICustomerRepository customerRepository = new CustomerRepository();
+
+// CUSTOMER - BUSINESS
+ICustomerService customerService =
+    new CustomerManager(customerRepository);
+
+// CUSTOMER - PRESENTATION
+CustomerScreens customerScreens =
+    new CustomerScreens(customerService);
+
+CustomerMenu customerMenu =
+    new CustomerMenu(customerScreens);
+
+
+// MAIN MENU
+MainMenu mainMenu = new MainMenu(
+    categoryMenu,
+    customerMenu);
+
+mainMenu.Show();
+
+---------------------------------------------------------------------------------
+
+
+public void ShowCustomerDetail()
+{
+    ConsoleRestaurantDesign.WriteHeader("Müþteri Detayý");
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Müþteri ID: ");
+    Console.ResetColor();
+
+    string? input = Console.ReadLine();
+
+    if (!int.TryParse(input, out int customerId) || customerId <= 0)
+    {
+        ConsoleRestaurantDesign.WriteError(
+            "Geçerli bir müþteri ID deðeri giriniz.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    Customer? customer = _customerService.GetCustomerById(customerId);
+
+    if (customer == null)
+    {
+        ConsoleRestaurantDesign.WriteError(
+            "Belirtilen ID deðerine ait müþteri bulunamadý.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    Console.WriteLine();
+
+    Console.ForegroundColor = ConsoleColor.Yellow;
+    Console.WriteLine("  ------------------------------------------------");
+    Console.WriteLine("                  MÜÞTERÝ BÝLGÝLERÝ");
+    Console.WriteLine("  ------------------------------------------------");
+    Console.ResetColor();
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Müþteri ID    : ");
+    Console.ForegroundColor = ConsoleColor.White;
+    Console.WriteLine(customer.CustomerId);
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Ad            : ");
+    Console.ForegroundColor = ConsoleColor.White;
+    Console.WriteLine(customer.CustomerName);
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Soyad         : ");
+    Console.ForegroundColor = ConsoleColor.White;
+    Console.WriteLine(customer.CustomerSurname);
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  E-Posta       : ");
+    Console.ForegroundColor = ConsoleColor.White;
+    Console.WriteLine(customer.CustomerEmail);
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Telefon       : ");
+    Console.ForegroundColor = ConsoleColor.White;
+    Console.WriteLine(customer.CustomerPhone);
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Ýlçe          : ");
+    Console.ForegroundColor = ConsoleColor.White;
+    Console.WriteLine(customer.District);
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Þehir         : ");
+    Console.ForegroundColor = ConsoleColor.White;
+    Console.WriteLine(customer.City);
+
+    Console.ResetColor();
+
+    Console.WriteLine();
+
+    ConsoleRestaurantDesign.WriteSuccess(
+        "Müþteri bilgileri baþarýyla getirildi.");
+
+    ConsoleRestaurantDesign.WaitForKey();
+}
+
+
+
+---------------------------------------------------------------------------------
+
+
+public void AddCustomer()
+{
+    ConsoleRestaurantDesign.WriteHeader("Yeni Müþteri Ekle");
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+
+    Console.Write("  Müþteri Adý    : ");
+    Console.ResetColor();
+    string? name = Console.ReadLine();
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Müþteri Soyadý : ");
+    Console.ResetColor();
+    string? surname = Console.ReadLine();
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  E-Posta Adresi : ");
+    Console.ResetColor();
+    string? email = Console.ReadLine();
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Telefon        : ");
+    Console.ResetColor();
+    string? phone = Console.ReadLine();
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Ýlçe           : ");
+    Console.ResetColor();
+    string? district = Console.ReadLine();
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Þehir          : ");
+    Console.ResetColor();
+    string? city = Console.ReadLine();
+
+    Console.WriteLine();
+
+    if (string.IsNullOrWhiteSpace(name) ||
+        string.IsNullOrWhiteSpace(surname) ||
+        string.IsNullOrWhiteSpace(email) ||
+        string.IsNullOrWhiteSpace(phone) ||
+        string.IsNullOrWhiteSpace(district) ||
+        string.IsNullOrWhiteSpace(city))
+    {
+        ConsoleRestaurantDesign.WriteError(
+            "Müþteri bilgileri boþ býrakýlamaz.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    Customer customer = new Customer
+    {
+        CustomerName = name.Trim(),
+        CustomerSurname = surname.Trim(),
+        CustomerEmail = email.Trim(),
+        CustomerPhone = phone.Trim(),
+        District = district.Trim(),
+        City = city.Trim()
+    };
+
+    ConsoleRestaurantDesign.WriteInfo(
+        "Müþteri kaydý oluþturuluyor...");
+
+    _customerService.AddCustomer(customer);
+
+    ConsoleRestaurantDesign.WaitForKey();
+}
+
+
+
+---------------------------------------------------------------------------------
+
+
+public void DeleteCustomer()
+{
+    ConsoleRestaurantDesign.WriteHeader("Müþteri Silme");
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Silinecek Müþteri ID: ");
+    Console.ResetColor();
+
+    string? input = Console.ReadLine();
+
+    if (!int.TryParse(input, out int customerId) || customerId <= 0)
+    {
+        ConsoleRestaurantDesign.WriteError(
+            "Geçerli bir müþteri ID deðeri giriniz.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    Customer? customer = _customerService.GetCustomerById(customerId);
+
+    if (customer == null)
+    {
+        ConsoleRestaurantDesign.WriteError(
+            "Silinecek müþteri bulunamadý.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    Console.WriteLine();
+
+    Console.ForegroundColor = ConsoleColor.Yellow;
+    Console.WriteLine("  ---------------------------------------------");
+    Console.WriteLine("              SÝLÝNECEK MÜÞTERÝ");
+    Console.WriteLine("  ---------------------------------------------");
+    Console.ResetColor();
+
+    Console.WriteLine($"  Müþteri ID : {customer.CustomerId}");
+    Console.WriteLine($"  Ad         : {customer.CustomerName}");
+    Console.WriteLine($"  Soyad      : {customer.CustomerSurname}");
+    Console.WriteLine($"  E-Posta    : {customer.CustomerEmail}");
+    Console.WriteLine($"  Telefon    : {customer.CustomerPhone}");
+    Console.WriteLine($"  Ýlçe       : {customer.District}");
+    Console.WriteLine($"  Þehir      : {customer.City}");
+
+    Console.WriteLine();
+
+    Console.ForegroundColor = ConsoleColor.Red;
+    Console.Write("  Bu müþteriyi silmek istediðinize emin misiniz? (E/H): ");
+    Console.ResetColor();
+
+    string? confirmation = Console.ReadLine();
+
+    if (!string.Equals(
+        confirmation?.Trim(),
+        "E",
+        StringComparison.OrdinalIgnoreCase))
+    {
+        ConsoleRestaurantDesign.WriteInfo(
+            "Müþteri silme iþlemi iptal edildi.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    try
+    {
+        _customerService.DeleteCustomer(customerId);
+    }
+    catch (Microsoft.EntityFrameworkCore.DbUpdateException)
+    {
+        ConsoleRestaurantDesign.WriteError(
+            "Müþteri silinemedi. Müþteriye ait sipariþ kayýtlarý bulunuyor olabilir.");
+    }
+
+    ConsoleRestaurantDesign.WaitForKey();
+}
+
+
+
+---------------------------------------------------------------------------------
+
+
+public void UpdateCustomer()
+{
+    ConsoleRestaurantDesign.WriteHeader("Müþteri Güncelleme");
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Güncellenecek Müþteri ID: ");
+    Console.ResetColor();
+
+    string? input = Console.ReadLine();
+
+    if (!int.TryParse(input, out int customerId) || customerId <= 0)
+    {
+        ConsoleRestaurantDesign.WriteError(
+            "Geçerli bir müþteri ID deðeri giriniz.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    Customer? customer = _customerService.GetCustomerById(customerId);
+
+    if (customer == null)
+    {
+        ConsoleRestaurantDesign.WriteError(
+            "Güncellenecek müþteri bulunamadý.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    Console.WriteLine();
+
+    Console.ForegroundColor = ConsoleColor.Yellow;
+    Console.WriteLine("  ----------------------------------------------");
+    Console.WriteLine("             MEVCUT MÜÞTERÝ BÝLGÝLERÝ");
+    Console.WriteLine("  ----------------------------------------------");
+    Console.ResetColor();
+
+    Console.WriteLine($"  Müþteri ID : {customer.CustomerId}");
+    Console.WriteLine($"  Ad         : {customer.CustomerName}");
+    Console.WriteLine($"  Soyad      : {customer.CustomerSurname}");
+    Console.WriteLine($"  E-Posta    : {customer.CustomerEmail}");
+    Console.WriteLine($"  Telefon    : {customer.CustomerPhone}");
+    Console.WriteLine($"  Ýlçe       : {customer.District}");
+    Console.WriteLine($"  Þehir      : {customer.City}");
+
+    Console.WriteLine();
+
+    ConsoleRestaurantDesign.WriteInfo(
+        "Deðiþtirmek istemediðiniz alanlarý boþ býrakabilirsiniz.");
+
+    Console.WriteLine();
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Yeni Ad         : ");
+    Console.ResetColor();
+    string? name = Console.ReadLine();
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Yeni Soyad      : ");
+    Console.ResetColor();
+    string? surname = Console.ReadLine();
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Yeni E-Posta    : ");
+    Console.ResetColor();
+    string? email = Console.ReadLine();
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Yeni Telefon    : ");
+    Console.ResetColor();
+    string? phone = Console.ReadLine();
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Yeni Ýlçe       : ");
+    Console.ResetColor();
+    string? district = Console.ReadLine();
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Yeni Þehir      : ");
+    Console.ResetColor();
+    string? city = Console.ReadLine();
+
+    // Mevcut bilgileri geçici olarak saklayalým.
+    string oldName = customer.CustomerName;
+    string oldSurname = customer.CustomerSurname;
+    string oldEmail = customer.CustomerEmail;
+    string oldPhone = customer.CustomerPhone;
+    string oldDistrict = customer.District;
+    string oldCity = customer.City;
+
+    // Boþ býrakýlmayan alanlarý güncelleyelim.
+    if (!string.IsNullOrWhiteSpace(name))
+        customer.CustomerName = name.Trim();
+
+    if (!string.IsNullOrWhiteSpace(surname))
+        customer.CustomerSurname = surname.Trim();
+
+    if (!string.IsNullOrWhiteSpace(email))
+        customer.CustomerEmail = email.Trim();
+
+    if (!string.IsNullOrWhiteSpace(phone))
+        customer.CustomerPhone = phone.Trim();
+
+    if (!string.IsNullOrWhiteSpace(district))
+        customer.District = district.Trim();
+
+    if (!string.IsNullOrWhiteSpace(city))
+        customer.City = city.Trim();
+
+    Console.WriteLine();
+
+    Console.ForegroundColor = ConsoleColor.Yellow;
+    Console.WriteLine("  -------------- GÜNCELLEME ÖZETÝ --------------");
+    Console.ResetColor();
+
+    Console.WriteLine($"  Ad      : {oldName} -> {customer.CustomerName}");
+    Console.WriteLine($"  Soyad   : {oldSurname} -> {customer.CustomerSurname}");
+    Console.WriteLine($"  E-Posta : {oldEmail} -> {customer.CustomerEmail}");
+    Console.WriteLine($"  Telefon : {oldPhone} -> {customer.CustomerPhone}");
+    Console.WriteLine($"  Ýlçe    : {oldDistrict} -> {customer.District}");
+    Console.WriteLine($"  Þehir   : {oldCity} -> {customer.City}");
+
+    Console.WriteLine();
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Deðiþiklikleri kaydetmek istiyor musunuz? (E/H): ");
+    Console.ResetColor();
+
+    string? confirmation = Console.ReadLine();
+
+    if (!string.Equals(
+        confirmation?.Trim(),
+        "E",
+        StringComparison.OrdinalIgnoreCase))
+    {
+        ConsoleRestaurantDesign.WriteInfo(
+            "Müþteri güncelleme iþlemi iptal edildi.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    _customerService.UpdateCustomer(customer);
+
+    ConsoleRestaurantDesign.WaitForKey();
+}
+
+---------------------------------------------------------------------------------
+
+
+public void SearchCustomerByEmail()
+{
+    ConsoleRestaurantDesign.WriteHeader("E-Posta ile Müþteri Arama");
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Müþteri E-Posta Adresi: ");
+    Console.ResetColor();
+
+    string? email = Console.ReadLine();
+
+    if (string.IsNullOrWhiteSpace(email))
+    {
+        ConsoleRestaurantDesign.WriteError(
+            "E-posta adresi boþ býrakýlamaz.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    Customer? customer =
+        _customerService.GetCustomerByEmail(email.Trim());
+
+    if (customer == null)
+    {
+        ConsoleRestaurantDesign.WriteError(
+            "Bu e-posta adresine ait müþteri bulunamadý.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    Console.WriteLine();
+
+    Console.ForegroundColor = ConsoleColor.Yellow;
+
+    Console.WriteLine("  ------------------------------------------------");
+    Console.WriteLine("                MÜÞTERÝ ARAMA SONUCU");
+    Console.WriteLine("  ------------------------------------------------");
+
+    Console.ResetColor();
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Müþteri ID    : ");
+    Console.ForegroundColor = ConsoleColor.White;
+    Console.WriteLine(customer.CustomerId);
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Ad            : ");
+    Console.ForegroundColor = ConsoleColor.White;
+    Console.WriteLine(customer.CustomerName);
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Soyad         : ");
+    Console.ForegroundColor = ConsoleColor.White;
+    Console.WriteLine(customer.CustomerSurname);
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  E-Posta       : ");
+    Console.ForegroundColor = ConsoleColor.White;
+    Console.WriteLine(customer.CustomerEmail);
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Telefon       : ");
+    Console.ForegroundColor = ConsoleColor.White;
+    Console.WriteLine(customer.CustomerPhone);
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Ýlçe          : ");
+    Console.ForegroundColor = ConsoleColor.White;
+    Console.WriteLine(customer.District);
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Þehir         : ");
+    Console.ForegroundColor = ConsoleColor.White;
+    Console.WriteLine(customer.City);
+
+    Console.ResetColor();
+
+    Console.WriteLine();
+
+    ConsoleRestaurantDesign.WriteSuccess(
+        "Müþteri baþarýyla bulundu.");
+
+    ConsoleRestaurantDesign.WaitForKey();
+}
+
+
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
