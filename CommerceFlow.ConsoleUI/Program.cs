@@ -19,9 +19,19 @@ CustomerMenu customerMenu = new CustomerMenu(customerScreens);
 
 IProductRepository productRepository = new ProductRepository();
 IProductService productService = new ProductManager(productRepository);
-ProductScreens productScreens = new ProductScreens(productService,categoryService);
+ProductScreens productScreens = new ProductScreens(productService, categoryService);
 ProductMenu productMenu = new ProductMenu(productScreens);
 
-MainMenu mainMenu = new MainMenu(categoryMenu, customerMenu, productMenu);
+
+IOrderRepository orderRepository = new OrderRepository();
+IOrderService orderService = new OrderManager(orderRepository, productRepository, customerRepository);
+OrderScreens orderScreens = new OrderScreens(orderService, productService, customerService);
+OrderMenu orderMenu = new OrderMenu(orderScreens);
+
+
+ReportScreens reportScreens = new ReportScreens(categoryService, customerService, productService, orderService);
+ReportMenu reportMenu = new ReportMenu(reportScreens);
+
+MainMenu mainMenu = new MainMenu(categoryMenu, customerMenu, productMenu, orderMenu, reportMenu);
 
 mainMenu.Show();

@@ -1,0 +1,746 @@
+
+using CommerceFlow.Business.Abstract;
+using CommerceFlow.ConsoleUI.Helpers;
+using CommerceFlow.Entities.Entities;
+
+namespace CommerceFlow.ConsoleUI.Screens
+{
+    public class OrderScreens
+    {
+        private readonly IOrderService _orderService;
+
+        public OrderScreens(IOrderService orderService)
+        {
+            _orderService = orderService;
+        }
+
+        public void ShowOrders()
+        {
+            ConsoleRestaurantDesign.WriteHeader("Sipariþ Listesi");
+
+            List<Order> orders = _orderService.GetAllOrders();
+
+            if (orders.Count == 0)
+            {
+                ConsoleRestaurantDesign.WriteInfo(
+                    "Kayýtlý sipariþ bulunamadý.");
+
+                ConsoleRestaurantDesign.WaitForKey();
+                return;
+            }
+
+            Console.ForegroundColor = ConsoleColor.Yellow;
+
+            Console.WriteLine(
+                $"  {"ID",-6} {"MÜÞTERÝ",-9} {"ÜRÜN",-7} {"ADET",-7} {"TOPLAM",-15} {"TARÝH",-13} {"DURUM",-18}");
+
+            Console.WriteLine(new string('-', 95));
+
+            Console.ResetColor();
+
+            foreach (Order order in orders)
+            {
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.Write($"  {order.OrderId,-6}");
+
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.Write($"{order.CustomerId,-9}");
+                Console.Write($"{order.ProductId,-7}");
+                Console.Write($"{order.OrderQuantity,-7}");
+
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.Write($"{order.OrderTotalPrice,-15:N2}");
+
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.Write($"{order.OrderDate,-13:dd.MM.yyyy}");
+
+                Console.ForegroundColor = order.OrderStatus switch
+                {
+                    "Teslim Edildi" => ConsoleColor.Green,
+                    "Kargoda" => ConsoleColor.Cyan,
+                    "Ýptal Edildi" => ConsoleColor.Red,
+                    _ => ConsoleColor.Yellow
+                };
+
+                Console.WriteLine($"{order.OrderStatus,-18}");
+            }
+
+            Console.ResetColor();
+
+            Console.WriteLine(new string('-', 95));
+            Console.WriteLine();
+
+            ConsoleRestaurantDesign.WriteSuccess(
+                $"Toplam {orders.Count} sipariþ listelendi.");
+
+            ConsoleRestaurantDesign.WaitForKey();
+        }
+
+        public void ShowPlaceholder(string title)
+        {
+            ConsoleRestaurantDesign.WriteHeader(title);
+
+            ConsoleRestaurantDesign.WriteInfo(
+                "Bu iþlem daha sonra geliþtirilecek.");
+
+            ConsoleRestaurantDesign.WaitForKey();
+        }
+    }
+}
+
+----------------------------------------------------------------------------------
+
+
+using CommerceFlow.ConsoleUI.Helpers;
+using CommerceFlow.ConsoleUI.Screens;
+
+namespace CommerceFlow.ConsoleUI.Menus
+{
+    public class OrderMenu
+    {
+        private readonly OrderScreens _orderScreens;
+
+        public OrderMenu(OrderScreens orderScreens)
+        {
+            _orderScreens = orderScreens;
+        }
+
+        public void Show()
+        {
+            bool isRunning = true;
+
+            while (isRunning)
+            {
+                ConsoleRestaurantDesign.WriteHeader("Sipariþ Yönetimi");
+
+                ConsoleRestaurantDesign.WriteMenuItem(
+                    1, "Sipariþleri Listele");
+
+                ConsoleRestaurantDesign.WriteMenuItem(
+                    2, "Sipariþ Detayýný Görüntüle");
+
+                ConsoleRestaurantDesign.WriteMenuItem(
+                    3, "Yeni Sipariþ Oluþtur");
+
+                ConsoleRestaurantDesign.WriteMenuItem(
+                    4, "Sipariþ Durumunu Güncelle");
+
+                ConsoleRestaurantDesign.WriteMenuItem(
+                    5, "Sipariþ Ýptal Et");
+
+                ConsoleRestaurantDesign.WriteMenuItem(
+                    0, "Ana Menüye Dön");
+
+                Console.WriteLine();
+
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.Write("  Seçiminiz: ");
+                Console.ResetColor();
+
+                string? choice = Console.ReadLine();
+
+                switch (choice)
+                {
+                    case "1":
+                        _orderScreens.ShowOrders();
+                        break;
+
+                    case "2":
+                        _orderScreens.ShowPlaceholder("Sipariþ Detayý");
+                        break;
+
+                    case "3":
+                        _orderScreens.ShowPlaceholder("Yeni Sipariþ Oluþtur");
+                        break;
+
+                    case "4":
+                        _orderScreens.ShowPlaceholder(
+                            "Sipariþ Durumunu Güncelle");
+                        break;
+
+                    case "5":
+                        _orderScreens.ShowPlaceholder("Sipariþ Ýptal Et");
+                        break;
+
+                    case "0":
+                        isRunning = false;
+                        break;
+
+                    default:
+                        ConsoleRestaurantDesign.WriteError(
+                            "Geçersiz seçim yaptýnýz.");
+
+                        ConsoleRestaurantDesign.WaitForKey();
+                        break;
+                }
+            }
+        }
+    }
+}
+
+
+----------------------------------------------------------------------------------
+
+
+// ORDER - DATA ACCESS
+IOrderRepository orderRepository = new OrderRepository();
+
+// ORDER - BUSINESS
+IOrderService orderService = new OrderManager(
+    orderRepository,
+    productRepository,
+    customerRepository);
+
+// ORDER - PRESENTATION
+OrderScreens orderScreens = new OrderScreens(orderService);
+
+OrderMenu orderMenu = new OrderMenu(orderScreens);
+
+
+
+----------------------------------------------------------------------------------
+
+
+public void AddOrder()
+{
+    ConsoleRestaurantDesign.WriteHeader("Yeni Sipariþ Oluþtur");
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Müþteri ID      : ");
+    Console.ResetColor();
+
+    string? customerInput = Console.ReadLine();
+
+    if (!int.TryParse(customerInput, out int customerId) ||
+        customerId <= 0)
+    {
+        ConsoleRestaurantDesign.WriteError(
+            "Geçerli bir müþteri ID deðeri giriniz.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    Customer? customer =
+        _customerService.GetCustomerById(customerId);
+
+    if (customer == null)
+    {
+        ConsoleRestaurantDesign.WriteError(
+            "Belirtilen müþteri bulunamadý.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    ConsoleRestaurantDesign.WriteSuccess(
+        $"Müþteri: {customer.CustomerName} {customer.CustomerSurname}");
+
+    Console.WriteLine();
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Ürün ID         : ");
+    Console.ResetColor();
+
+    string? productInput = Console.ReadLine();
+
+    if (!int.TryParse(productInput, out int productId) ||
+        productId <= 0)
+    {
+        ConsoleRestaurantDesign.WriteError(
+            "Geçerli bir ürün ID deðeri giriniz.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    Product? product =
+        _productService.GetProductById(productId);
+
+    if (product == null)
+    {
+        ConsoleRestaurantDesign.WriteError(
+            "Belirtilen ürün bulunamadý.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    ConsoleRestaurantDesign.WriteSuccess(
+        $"Ürün: {product.ProductName}");
+
+    ConsoleRestaurantDesign.WriteInfo(
+        $"Birim Fiyat: {product.ProductPrice:N2} TL");
+
+    ConsoleRestaurantDesign.WriteInfo(
+        $"Mevcut Stok: {product.ProductStock}");
+
+    Console.WriteLine();
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Sipariþ Adedi   : ");
+    Console.ResetColor();
+
+    string? quantityInput = Console.ReadLine();
+
+    if (!int.TryParse(quantityInput, out int quantity) ||
+        quantity <= 0)
+    {
+        ConsoleRestaurantDesign.WriteError(
+            "Sipariþ adedi sýfýrdan büyük olmalýdýr.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    if (quantity > product.ProductStock)
+    {
+        ConsoleRestaurantDesign.WriteError(
+            "Sipariþ adedi mevcut stok miktarýný aþamaz.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    decimal totalPrice = product.ProductPrice * quantity;
+
+    Console.WriteLine();
+
+    Console.ForegroundColor = ConsoleColor.Yellow;
+    Console.WriteLine("  -----------------------------------------------");
+    Console.WriteLine("                 SÝPARÝÞ ÖZETÝ");
+    Console.WriteLine("  -----------------------------------------------");
+    Console.ResetColor();
+
+    Console.WriteLine(
+        $"  Müþteri       : {customer.CustomerName} {customer.CustomerSurname}");
+
+    Console.WriteLine(
+        $"  Ürün          : {product.ProductName}");
+
+    Console.WriteLine(
+        $"  Birim Fiyat   : {product.ProductPrice:N2} TL");
+
+    Console.WriteLine(
+        $"  Sipariþ Adedi : {quantity}");
+
+    Console.ForegroundColor = ConsoleColor.Green;
+    Console.WriteLine(
+        $"  Toplam Tutar  : {totalPrice:N2} TL");
+    Console.ResetColor();
+
+    Console.WriteLine();
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Sipariþi oluþturmak istiyor musunuz? (E/H): ");
+    Console.ResetColor();
+
+    string? confirmation = Console.ReadLine();
+
+    if (!string.Equals(
+        confirmation?.Trim(),
+        "E",
+        StringComparison.OrdinalIgnoreCase))
+    {
+        ConsoleRestaurantDesign.WriteInfo(
+            "Sipariþ oluþturma iþlemi iptal edildi.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    Order order = new Order
+    {
+        CustomerId = customerId,
+        ProductId = productId,
+        OrderQuantity = quantity
+    };
+
+    _orderService.AddOrder(order);
+
+    ConsoleRestaurantDesign.WaitForKey();
+}
+
+
+----------------------------------------------------------------------------------
+
+
+public void ShowOrderDetail()
+{
+    ConsoleRestaurantDesign.WriteHeader("Sipariþ Detayý");
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Sipariþ ID: ");
+    Console.ResetColor();
+
+    string? input = Console.ReadLine();
+
+    if (!int.TryParse(input, out int orderId) || orderId <= 0)
+    {
+        ConsoleRestaurantDesign.WriteError(
+            "Geçerli bir sipariþ ID deðeri giriniz.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    Order? order = _orderService.GetOrderById(orderId);
+
+    if (order == null)
+    {
+        ConsoleRestaurantDesign.WriteError(
+            "Belirtilen ID deðerine ait sipariþ bulunamadý.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    Customer? customer =
+        _customerService.GetCustomerById(order.CustomerId);
+
+    Product? product =
+        _productService.GetProductById(order.ProductId);
+
+    Console.WriteLine();
+
+    Console.ForegroundColor = ConsoleColor.Yellow;
+    Console.WriteLine("  ------------------------------------------------");
+    Console.WriteLine("                  SÝPARÝÞ BÝLGÝLERÝ");
+    Console.WriteLine("  ------------------------------------------------");
+    Console.ResetColor();
+
+    Console.WriteLine($"  Sipariþ ID     : {order.OrderId}");
+    Console.WriteLine($"  Sipariþ Tarihi : {order.OrderDate:dd.MM.yyyy HH:mm}");
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Sipariþ Durumu : ");
+
+    Console.ForegroundColor = order.OrderStatus switch
+    {
+        "Teslim Edildi" => ConsoleColor.Green,
+        "Kargoda" => ConsoleColor.Cyan,
+        "Ýptal Edildi" => ConsoleColor.Red,
+        _ => ConsoleColor.Yellow
+    };
+
+    Console.WriteLine(order.OrderStatus);
+    Console.ResetColor();
+
+    Console.WriteLine();
+
+    Console.ForegroundColor = ConsoleColor.Yellow;
+    Console.WriteLine("  ---------------- MÜÞTERÝ ----------------");
+    Console.ResetColor();
+
+    Console.WriteLine($"  Müþteri ID : {order.CustomerId}");
+
+    if (customer != null)
+    {
+        Console.WriteLine(
+            $"  Ad Soyad   : {customer.CustomerName} {customer.CustomerSurname}");
+
+        Console.WriteLine($"  E-Posta    : {customer.CustomerEmail}");
+        Console.WriteLine($"  Telefon    : {customer.CustomerPhone}");
+        Console.WriteLine($"  Þehir      : {customer.City}");
+    }
+    else
+    {
+        ConsoleRestaurantDesign.WriteError(
+            "Müþteri bilgileri bulunamadý.");
+    }
+
+    Console.WriteLine();
+
+    Console.ForegroundColor = ConsoleColor.Yellow;
+    Console.WriteLine("  ----------------- ÜRÜN ------------------");
+    Console.ResetColor();
+
+    Console.WriteLine($"  Ürün ID       : {order.ProductId}");
+
+    if (product != null)
+    {
+        Console.WriteLine($"  Ürün Adý      : {product.ProductName}");
+        Console.WriteLine($"  Güncel Fiyat  : {product.ProductPrice:N2} TL");
+    }
+    else
+    {
+        ConsoleRestaurantDesign.WriteError(
+            "Ürün bilgileri bulunamadý.");
+    }
+
+    Console.WriteLine($"  Sipariþ Adedi : {order.OrderQuantity}");
+
+    Console.WriteLine();
+
+    Console.ForegroundColor = ConsoleColor.Green;
+    Console.WriteLine(
+        $"  Sipariþ Toplamý : {order.OrderTotalPrice:N2} TL");
+
+    Console.ResetColor();
+
+    Console.WriteLine();
+
+    ConsoleRestaurantDesign.WriteSuccess(
+        "Sipariþ bilgileri baþarýyla getirildi.");
+
+    ConsoleRestaurantDesign.WaitForKey();
+}
+
+
+
+----------------------------------------------------------------------------------
+
+
+public void UpdateOrderStatus()
+{
+    ConsoleRestaurantDesign.WriteHeader("Sipariþ Durumunu Güncelle");
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Güncellenecek Sipariþ ID: ");
+    Console.ResetColor();
+
+    string? input = Console.ReadLine();
+
+    if (!int.TryParse(input, out int orderId) || orderId <= 0)
+    {
+        ConsoleRestaurantDesign.WriteError(
+            "Geçerli bir sipariþ ID deðeri giriniz.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    Order? order = _orderService.GetOrderById(orderId);
+
+    if (order == null)
+    {
+        ConsoleRestaurantDesign.WriteError(
+            "Belirtilen sipariþ bulunamadý.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    Console.WriteLine();
+
+    Console.ForegroundColor = ConsoleColor.Yellow;
+    Console.WriteLine("  ---------------------------------------------");
+    Console.WriteLine("                SÝPARÝÞ BÝLGÝLERÝ");
+    Console.WriteLine("  ---------------------------------------------");
+    Console.ResetColor();
+
+    Console.WriteLine($"  Sipariþ ID     : {order.OrderId}");
+    Console.WriteLine($"  Müþteri ID     : {order.CustomerId}");
+    Console.WriteLine($"  Ürün ID        : {order.ProductId}");
+    Console.WriteLine($"  Sipariþ Adedi  : {order.OrderQuantity}");
+    Console.WriteLine($"  Toplam Tutar   : {order.OrderTotalPrice:N2} TL");
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Mevcut Durum   : ");
+
+    Console.ForegroundColor = order.OrderStatus switch
+    {
+        "Hazýrlanýyor" => ConsoleColor.Yellow,
+        "Kargoda" => ConsoleColor.Cyan,
+        "Teslim Edildi" => ConsoleColor.Green,
+        "Ýptal Edildi" => ConsoleColor.Red,
+        _ => ConsoleColor.White
+    };
+
+    Console.WriteLine(order.OrderStatus);
+    Console.ResetColor();
+
+    Console.WriteLine();
+
+    if (order.OrderStatus == "Teslim Edildi")
+    {
+        ConsoleRestaurantDesign.WriteInfo(
+            "Bu sipariþ teslim edilmiþtir. Durumu deðiþtirilemez.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    if (order.OrderStatus == "Ýptal Edildi")
+    {
+        ConsoleRestaurantDesign.WriteError(
+            "Ýptal edilmiþ sipariþin durumu deðiþtirilemez.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    string newStatus;
+
+    if (order.OrderStatus == "Hazýrlanýyor")
+    {
+        newStatus = "Kargoda";
+    }
+    else if (order.OrderStatus == "Kargoda")
+    {
+        newStatus = "Teslim Edildi";
+    }
+    else
+    {
+        ConsoleRestaurantDesign.WriteError(
+            "Sipariþ durumu güncellemeye uygun deðil.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    ConsoleRestaurantDesign.WriteInfo(
+        $"Yeni Sipariþ Durumu: {newStatus}");
+
+    Console.WriteLine();
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Durum deðiþikliðini onaylýyor musunuz? (E/H): ");
+    Console.ResetColor();
+
+    string? confirmation = Console.ReadLine();
+
+    if (!string.Equals(
+        confirmation?.Trim(),
+        "E",
+        StringComparison.OrdinalIgnoreCase))
+    {
+        ConsoleRestaurantDesign.WriteInfo(
+            "Sipariþ durumu güncelleme iþlemi iptal edildi.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    _orderService.UpdateOrderStatus(orderId, newStatus);
+
+    ConsoleRestaurantDesign.WaitForKey();
+}
+
+----------------------------------------------------------------------------------
+
+
+public void CancelOrder()
+{
+    ConsoleRestaurantDesign.WriteHeader("Sipariþ Ýptal Etme");
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Ýptal Edilecek Sipariþ ID: ");
+    Console.ResetColor();
+
+    string? input = Console.ReadLine();
+
+    if (!int.TryParse(input, out int orderId) || orderId <= 0)
+    {
+        ConsoleRestaurantDesign.WriteError(
+            "Geçerli bir sipariþ ID deðeri giriniz.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    Order? order = _orderService.GetOrderById(orderId);
+
+    if (order == null)
+    {
+        ConsoleRestaurantDesign.WriteError(
+            "Belirtilen sipariþ bulunamadý.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    Customer? customer =
+        _customerService.GetCustomerById(order.CustomerId);
+
+    Product? product =
+        _productService.GetProductById(order.ProductId);
+
+    Console.WriteLine();
+
+    Console.ForegroundColor = ConsoleColor.Yellow;
+    Console.WriteLine("  ---------------------------------------------");
+    Console.WriteLine("             ÝPTAL EDÝLECEK SÝPARÝÞ");
+    Console.WriteLine("  ---------------------------------------------");
+    Console.ResetColor();
+
+    Console.WriteLine($"  Sipariþ ID     : {order.OrderId}");
+    Console.WriteLine($"  Sipariþ Tarihi : {order.OrderDate:dd.MM.yyyy HH:mm}");
+
+    Console.WriteLine(
+        $"  Müþteri        : {customer?.CustomerName} {customer?.CustomerSurname}");
+
+    Console.WriteLine(
+        $"  Ürün           : {product?.ProductName ?? "Ürün bulunamadý"}");
+
+    Console.WriteLine($"  Sipariþ Adedi  : {order.OrderQuantity}");
+    Console.WriteLine($"  Toplam Tutar   : {order.OrderTotalPrice:N2} TL");
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Sipariþ Durumu : ");
+
+    Console.ForegroundColor = order.OrderStatus switch
+    {
+        "Hazýrlanýyor" => ConsoleColor.Yellow,
+        "Kargoda" => ConsoleColor.Cyan,
+        "Teslim Edildi" => ConsoleColor.Green,
+        "Ýptal Edildi" => ConsoleColor.Red,
+        _ => ConsoleColor.White
+    };
+
+    Console.WriteLine(order.OrderStatus);
+    Console.ResetColor();
+
+    Console.WriteLine();
+
+    if (order.OrderStatus != "Hazýrlanýyor")
+    {
+        ConsoleRestaurantDesign.WriteError(
+            "Yalnýzca hazýrlanýyor durumundaki sipariþler iptal edilebilir.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    if (product == null)
+    {
+        ConsoleRestaurantDesign.WriteError(
+            "Sipariþe ait ürün bulunamadýðý için iptal iþlemi yapýlamýyor.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    ConsoleRestaurantDesign.WriteInfo(
+        $"Ýptal sonrasýnda {order.OrderQuantity} adet ürün stoða geri eklenecek.");
+
+    Console.WriteLine();
+
+    Console.ForegroundColor = ConsoleColor.Red;
+    Console.Write("  Sipariþi iptal etmek istiyor musunuz? (E/H): ");
+    Console.ResetColor();
+
+    string? confirmation = Console.ReadLine();
+
+    if (!string.Equals(
+        confirmation?.Trim(),
+        "E",
+        StringComparison.OrdinalIgnoreCase))
+    {
+        ConsoleRestaurantDesign.WriteInfo(
+            "Sipariþ iptal iþlemi kullanýcý tarafýndan vazgeçildi.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    _orderService.CancelOrder(orderId);
+
+    ConsoleRestaurantDesign.WaitForKey();
+}
+
+
+
+----------------------------------------------------------------------------------
+----------------------------------------------------------------------------------
+----------------------------------------------------------------------------------

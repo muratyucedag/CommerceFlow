@@ -20,7 +20,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Requirements", "Requirement
 		CustomerFinalCodes.txt = CustomerFinalCodes.txt
 		FinalConsoleCodes.txt = FinalConsoleCodes.txt
 		LaterWillUse.txt = LaterWillUse.txt
+		OrderFinalCodes.txt = OrderFinalCodes.txt
 		ProductFinalCodes.txt = ProductFinalCodes.txt
+		ReportCodes.txt = ReportCodes.txt
 		SQLQueryExamples.txt = SQLQueryExamples.txt
 	EndProjectSection
 EndProject

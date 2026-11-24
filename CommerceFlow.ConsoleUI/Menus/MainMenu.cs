@@ -12,13 +12,16 @@ namespace CommerceFlow.ConsoleUI.Menus
         private readonly CategoryMenu _categoryMenu;
         private readonly CustomerMenu _customerMenu;
         private readonly ProductMenu _productMenu;
-        public MainMenu(CategoryMenu categoryMenu, CustomerMenu customerMenu, ProductMenu productMenu)
+        private readonly OrderMenu _orderMenu;
+        private readonly ReportMenu _reportMenu;
+        public MainMenu(CategoryMenu categoryMenu, CustomerMenu customerMenu, ProductMenu productMenu, OrderMenu orderMenu, ReportMenu reportMenu)
         {
             _categoryMenu = categoryMenu;
             _customerMenu = customerMenu;
             _productMenu = productMenu;
+            _orderMenu = orderMenu;
+            _reportMenu = reportMenu;
         }
-
         public void Show()
         {
             bool isRunning = true;
@@ -47,8 +50,8 @@ namespace CommerceFlow.ConsoleUI.Menus
                     case "1": _productMenu.Show(); break;
                     case "2": _categoryMenu.Show(); break;
                     case "3": _customerMenu.Show(); break;
-                    case "4": ShowPlaceholder("Sipariş İşlemleri"); break;
-                    case "5": ShowPlaceholder("Raporlar"); break;
+                    case "4": _orderMenu.Show(); break;
+                    case "5": _reportMenu.Show(); break;
                     case "0": isRunning = false; break;
                     default: ConsoleRestaurantDesign.WriteError("Geçersiz seçim yaptınız."); ConsoleRestaurantDesign.WaitForKey(); break;
                 }
@@ -56,12 +59,6 @@ namespace CommerceFlow.ConsoleUI.Menus
 
             Console.Clear();
             ConsoleRestaurantDesign.WriteSuccess("CommerceFlow uygulamasından çıkış yapıldı.");
-        }
-        private void ShowPlaceholder(string title)
-        {
-            ConsoleRestaurantDesign.WriteHeader(title);
-            ConsoleRestaurantDesign.WriteInfo("Bu bölümün işlemleri daha sonra eklenecek.");
-            ConsoleRestaurantDesign.WaitForKey();
         }
     }
 }
