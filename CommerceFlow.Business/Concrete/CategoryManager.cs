@@ -1,4 +1,5 @@
 ﻿using CommerceFlow.Business.Abstract;
+using CommerceFlow.Business.Results;
 using CommerceFlow.DataAccess.Interfaces;
 using CommerceFlow.Entities.Entities;
 
@@ -12,87 +13,112 @@ namespace CommerceFlow.Business.Concrete
             _categoryRepository = categoryRepository;
         }
 
-        public void AddCategory(Category category)
+        public ServiceResult AddCategory(Category category)
         {
-            if (category == null)
-            {
-                Console.WriteLine("Kategori bilgisi bulunamadı.");
-                return;
-            }
-
             if (string.IsNullOrWhiteSpace(category.CategoryName))
             {
-                Console.WriteLine("Kategori adı boş olamaz.");
-                return;
+                return new ServiceResult
+                {
+                    IsSuccess = false,
+                    Message = "Kategori adı boş bırakılamaz."
+                };
             }
 
-            if (category.CategoryName.Length < 3)
+            string categoryName = category.CategoryName.Trim();
+
+            if (categoryName.Length < 3)
             {
-                Console.WriteLine("Kategori adı en az 3 karakter olmalıdır.");
-                return;
+                return new ServiceResult
+                {
+                    IsSuccess = false,
+                    Message = "Kategori adı en az 3 karakter olmalıdır."
+                };
             }
 
-            var categories = _categoryRepository.GetAll();
-
-            bool categoryExists = categories.Any(x => x.CategoryName.ToLower() == category.CategoryName.Trim().ToLower());
+            bool categoryExists = _categoryRepository.GetAll().Any(x => string.Equals(x.CategoryName?.Trim(), categoryName, StringComparison.OrdinalIgnoreCase));
 
             if (categoryExists)
             {
-                Console.WriteLine("Bu isimde bir kategori zaten mevcut.");
-                return;
+                return new ServiceResult
+                {
+                    IsSuccess = false,
+                    Message = "Bu kategori zaten kayıtlı."
+                };
             }
 
-            category.CategoryName = category.CategoryName.Trim();
+            category.CategoryName = categoryName;
 
             _categoryRepository.Insert(category);
 
-            Console.WriteLine("Kategori başarıyla eklendi.");
+            return new ServiceResult
+            {
+                IsSuccess = true,
+                Message = "Kategori başarıyla eklendi."
+            };
         }
 
-        public void UpdateCategory(Category category)
+
+        public ServiceResult UpdateCategory(Category category)
         {
-            if (category == null || category.CategoryId <= 0)
-            {
-                Console.WriteLine("Kategori bilgileri geçersiz.");
-                return;
-            }
-
-            if (string.IsNullOrWhiteSpace(category.CategoryName))
-            {
-                Console.WriteLine("Kategori adı boş olamaz.");
-                return;
-            }
-
-            if (category.CategoryName.Trim().Length < 3)
-            {
-                Console.WriteLine("Kategori adı en az 3 karakter olmalıdır.");
-                return;
-            }
-
             Category? existingCategory = _categoryRepository.GetById(category.CategoryId);
 
             if (existingCategory == null)
             {
-                Console.WriteLine("Güncellenecek kategori bulunamadı.");
-                return;
+                return new ServiceResult
+                {
+                    IsSuccess = false,
+                    Message = "Güncellenecek kategori bulunamadı."
+                };
             }
 
-            var categories = _categoryRepository.GetAll();
+            if (string.IsNullOrWhiteSpace(category.CategoryName))
+            {
+                return new ServiceResult
+                {
+                    IsSuccess = false,
+                    Message = "Kategori adı boş bırakılamaz."
+                };
+            }
 
-            bool categoryExists = categories.Any(x => x.CategoryId != category.CategoryId && x.CategoryName.ToLower() == category.CategoryName.Trim().ToLower());
+            string categoryName = category.CategoryName.Trim();
+
+            if (categoryName.Length < 3)
+            {
+                return new ServiceResult
+                {
+                    IsSuccess = false,
+                    Message = "Kategori adı en az 3 karakter olmalıdır."
+                };
+            }
+
+            bool categoryExists = _categoryRepository.GetAll()
+                .Any(x =>
+                    x.CategoryId != category.CategoryId &&
+                    string.Equals(
+                        x.CategoryName?.Trim(),
+                        categoryName,
+                        StringComparison.OrdinalIgnoreCase));
 
             if (categoryExists)
             {
-                Console.WriteLine("Bu isim başka bir kategoride kullanılıyor.");
-                return;
+                return new ServiceResult
+                {
+                    IsSuccess = false,
+                    Message = "Bu kategori adı başka bir kategoride kullanılıyor."
+                };
             }
 
-            category.CategoryName = category.CategoryName.Trim();
+            existingCategory.CategoryName = categoryName;
 
-            _categoryRepository.Update(category);
+            _categoryRepository.Update(existingCategory);
 
-            Console.WriteLine("Kategori başarıyla güncellendi.");
+            return new ServiceResult
+            {
+                IsSuccess = true,
+                Message = "Kategori başarıyla güncellendi."
+            };
         }
+
 
         public void DeleteCategory(int id)
         {

@@ -1,4 +1,5 @@
 ﻿using CommerceFlow.Business.Abstract;
+using CommerceFlow.Business.Results;
 using CommerceFlow.ConsoleUI.Helpers;
 using CommerceFlow.Entities.Entities;
 using System;
@@ -56,6 +57,7 @@ namespace CommerceFlow.ConsoleUI.Screens
             ConsoleRestaurantDesign.WaitForKey();
         }
 
+
         public void AddCategory()
         {
             ConsoleRestaurantDesign.WriteHeader("Yeni Kategori Ekle");
@@ -66,22 +68,25 @@ namespace CommerceFlow.ConsoleUI.Screens
 
             string? categoryName = Console.ReadLine();
 
-            if (string.IsNullOrWhiteSpace(categoryName))
-            {
-                ConsoleRestaurantDesign.WriteError("Kategori adı boş bırakılamaz.");
-                ConsoleRestaurantDesign.WaitForKey();
-                return;
-            }
-
             Category category = new Category
             {
-                CategoryName = categoryName.Trim()
+                CategoryName = categoryName?.Trim() ?? string.Empty
             };
 
-            _categoryService.AddCategory(category);
+            ServiceResult result = _categoryService.AddCategory(category);
+
+            if (result.IsSuccess)
+            {
+                ConsoleRestaurantDesign.WriteSuccess(result.Message);
+            }
+            else
+            {
+                ConsoleRestaurantDesign.WriteError(result.Message);
+            }
 
             ConsoleRestaurantDesign.WaitForKey();
         }
+
 
         public void ShowCategoryDetail()
         {
@@ -200,6 +205,7 @@ namespace CommerceFlow.ConsoleUI.Screens
         }
 
 
+
         public void UpdateCategory()
         {
             ConsoleRestaurantDesign.WriteHeader("Kategori Güncelleme");
@@ -222,6 +228,7 @@ namespace CommerceFlow.ConsoleUI.Screens
             if (category == null)
             {
                 ConsoleRestaurantDesign.WriteError("Güncellenecek kategori bulunamadı.");
+
                 ConsoleRestaurantDesign.WaitForKey();
                 return;
             }
@@ -229,9 +236,7 @@ namespace CommerceFlow.ConsoleUI.Screens
             Console.WriteLine();
 
             Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine("  ---------------------------------------------");
-            Console.WriteLine("             MEVCUT KATEGORİ BİLGİLERİ");
-            Console.WriteLine("  ---------------------------------------------");
+            Console.WriteLine("  -------- MEVCUT KATEGORİ BİLGİLERİ --------");
             Console.ResetColor();
 
             Console.WriteLine($"  Kategori ID  : {category.CategoryId}");
@@ -245,16 +250,7 @@ namespace CommerceFlow.ConsoleUI.Screens
 
             string? newCategoryName = Console.ReadLine();
 
-            if (string.IsNullOrWhiteSpace(newCategoryName))
-            {
-                ConsoleRestaurantDesign.WriteError("Yeni kategori adı boş bırakılamaz.");
-                ConsoleRestaurantDesign.WaitForKey();
-                return;
-            }
-
             string oldCategoryName = category.CategoryName;
-
-            category.CategoryName = newCategoryName.Trim();
 
             Console.WriteLine();
 
@@ -263,7 +259,7 @@ namespace CommerceFlow.ConsoleUI.Screens
             Console.ResetColor();
 
             Console.WriteLine($"  Eski Kategori Adı : {oldCategoryName}");
-            Console.WriteLine($"  Yeni Kategori Adı : {category.CategoryName}");
+            Console.WriteLine($"  Yeni Kategori Adı : {newCategoryName}");
 
             Console.WriteLine();
 
@@ -276,14 +272,32 @@ namespace CommerceFlow.ConsoleUI.Screens
             if (!string.Equals(confirmation?.Trim(), "E", StringComparison.OrdinalIgnoreCase))
             {
                 ConsoleRestaurantDesign.WriteInfo("Kategori güncelleme işlemi iptal edildi.");
+
                 ConsoleRestaurantDesign.WaitForKey();
                 return;
             }
 
-            _categoryService.UpdateCategory(category);
+            Category updatedCategory = new Category
+            {
+                CategoryId = category.CategoryId,
+                CategoryName = newCategoryName ?? string.Empty
+            };
+
+            ServiceResult result =
+                _categoryService.UpdateCategory(updatedCategory);
+
+            if (result.IsSuccess)
+            {
+                ConsoleRestaurantDesign.WriteSuccess(result.Message);
+            }
+            else
+            {
+                ConsoleRestaurantDesign.WriteError(result.Message);
+            }
 
             ConsoleRestaurantDesign.WaitForKey();
         }
+
 
 
 

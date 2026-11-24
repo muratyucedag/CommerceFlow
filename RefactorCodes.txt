@@ -1,0 +1,255 @@
+
+public ServiceResult AddCategory(Category category)
+{
+    if (string.IsNullOrWhiteSpace(category.CategoryName))
+    {
+        return new ServiceResult
+        {
+            IsSuccess = false,
+            Message = "Kategori adý boþ býrakýlamaz."
+        };
+    }
+
+    string categoryName = category.CategoryName.Trim();
+
+    if (categoryName.Length < 3)
+    {
+        return new ServiceResult
+        {
+            IsSuccess = false,
+            Message = "Kategori adý en az 3 karakter olmalýdýr."
+        };
+    }
+
+    bool categoryExists = _categoryRepository.GetAll()
+        .Any(x => string.Equals(
+            x.CategoryName?.Trim(),
+            categoryName,
+            StringComparison.OrdinalIgnoreCase));
+
+    if (categoryExists)
+    {
+        return new ServiceResult
+        {
+            IsSuccess = false,
+            Message = "Bu kategori zaten kayýtlý."
+        };
+    }
+
+    category.CategoryName = categoryName;
+
+    _categoryRepository.Insert(category);
+
+    return new ServiceResult
+    {
+        IsSuccess = true,
+        Message = "Kategori baþarýyla eklendi."
+    };
+}
+
+---------------------------------------------------------------------
+
+
+public void AddCategory()
+{
+    ConsoleRestaurantDesign.WriteHeader("Yeni Kategori Ekle");
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Kategori Adý: ");
+    Console.ResetColor();
+
+    string? categoryName = Console.ReadLine();
+
+    Category category = new Category
+    {
+        CategoryName = categoryName?.Trim() ?? string.Empty
+    };
+
+    ServiceResult result = _categoryService.AddCategory(category);
+
+    if (result.IsSuccess)
+    {
+        ConsoleRestaurantDesign.WriteSuccess(result.Message);
+    }
+    else
+    {
+        ConsoleRestaurantDesign.WriteError(result.Message);
+    }
+
+    ConsoleRestaurantDesign.WaitForKey();
+}
+
+
+---------------------------------------------------------------------
+
+
+public ServiceResult UpdateCategory(Category category)
+{
+    Category? existingCategory =
+        _categoryRepository.GetById(category.CategoryId);
+
+    if (existingCategory == null)
+    {
+        return new ServiceResult
+        {
+            IsSuccess = false,
+            Message = "Güncellenecek kategori bulunamadý."
+        };
+    }
+
+    if (string.IsNullOrWhiteSpace(category.CategoryName))
+    {
+        return new ServiceResult
+        {
+            IsSuccess = false,
+            Message = "Kategori adý boþ býrakýlamaz."
+        };
+    }
+
+    string categoryName = category.CategoryName.Trim();
+
+    if (categoryName.Length < 3)
+    {
+        return new ServiceResult
+        {
+            IsSuccess = false,
+            Message = "Kategori adý en az 3 karakter olmalýdýr."
+        };
+    }
+
+    bool categoryExists = _categoryRepository.GetAll()
+        .Any(x =>
+            x.CategoryId != category.CategoryId &&
+            string.Equals(
+                x.CategoryName?.Trim(),
+                categoryName,
+                StringComparison.OrdinalIgnoreCase));
+
+    if (categoryExists)
+    {
+        return new ServiceResult
+        {
+            IsSuccess = false,
+            Message = "Bu kategori adý baþka bir kategoride kullanýlýyor."
+        };
+    }
+
+    existingCategory.CategoryName = categoryName;
+
+    _categoryRepository.Update(existingCategory);
+
+    return new ServiceResult
+    {
+        IsSuccess = true,
+        Message = "Kategori baþarýyla güncellendi."
+    };
+}
+
+
+
+---------------------------------------------------------------------
+
+
+public void UpdateCategory()
+{
+    ConsoleRestaurantDesign.WriteHeader("Kategori Güncelleme");
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Güncellenecek Kategori ID: ");
+    Console.ResetColor();
+
+    string? input = Console.ReadLine();
+
+    if (!int.TryParse(input, out int categoryId) || categoryId <= 0)
+    {
+        ConsoleRestaurantDesign.WriteError(
+            "Geçerli bir kategori ID deðeri giriniz.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    Category? category = _categoryService.GetCategoryById(categoryId);
+
+    if (category == null)
+    {
+        ConsoleRestaurantDesign.WriteError(
+            "Güncellenecek kategori bulunamadý.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    Console.WriteLine();
+
+    Console.ForegroundColor = ConsoleColor.Yellow;
+    Console.WriteLine("  -------- MEVCUT KATEGORÝ BÝLGÝLERÝ --------");
+    Console.ResetColor();
+
+    Console.WriteLine($"  Kategori ID  : {category.CategoryId}");
+    Console.WriteLine($"  Kategori Adý : {category.CategoryName}");
+
+    Console.WriteLine();
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Yeni Kategori Adý: ");
+    Console.ResetColor();
+
+    string? newCategoryName = Console.ReadLine();
+
+    string oldCategoryName = category.CategoryName;
+
+    Console.WriteLine();
+
+    Console.ForegroundColor = ConsoleColor.Yellow;
+    Console.WriteLine("  -------- GÜNCELLEME ÖZETÝ --------");
+    Console.ResetColor();
+
+    Console.WriteLine($"  Eski Kategori Adý : {oldCategoryName}");
+    Console.WriteLine($"  Yeni Kategori Adý : {newCategoryName}");
+
+    Console.WriteLine();
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Deðiþiklikleri kaydetmek istiyor musunuz? (E/H): ");
+    Console.ResetColor();
+
+    string? confirmation = Console.ReadLine();
+
+    if (!string.Equals(
+        confirmation?.Trim(),
+        "E",
+        StringComparison.OrdinalIgnoreCase))
+    {
+        ConsoleRestaurantDesign.WriteInfo(
+            "Kategori güncelleme iþlemi iptal edildi.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    Category updatedCategory = new Category
+    {
+        CategoryId = category.CategoryId,
+        CategoryName = newCategoryName ?? string.Empty
+    };
+
+    ServiceResult result =
+        _categoryService.UpdateCategory(updatedCategory);
+
+    if (result.IsSuccess)
+    {
+        ConsoleRestaurantDesign.WriteSuccess(result.Message);
+    }
+    else
+    {
+        ConsoleRestaurantDesign.WriteError(result.Message);
+    }
+
+    ConsoleRestaurantDesign.WaitForKey();
+}
+
+---------------------------------------------------------------------
+---------------------------------------------------------------------
+---------------------------------------------------------------------
+
