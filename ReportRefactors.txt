@@ -1,0 +1,695 @@
+-------------------------------------------------------------------------
+
+
+namespace CommerceFlow.Business.Reports
+{
+    public class GeneralStatisticsReport
+    {
+        public int TotalCategories { get; set; }
+        public int TotalCustomers { get; set; }
+        public int TotalProducts { get; set; }
+        public int TotalOrders { get; set; }
+        public int TotalStock { get; set; }
+        public int LowStockProducts { get; set; }
+        public int OutOfStockProducts { get; set; }
+    }
+}
+
+
+
+-------------------------------------------------------------------------
+
+
+using CommerceFlow.Business.Abstract;
+using CommerceFlow.Business.Reports;
+using CommerceFlow.DataAccess.Interfaces;
+using System.Linq;
+
+namespace CommerceFlow.Business.Concrete
+{
+    public class ReportManager : IReportService
+    {
+        private readonly ICategoryRepository _categoryRepository;
+        private readonly ICustomerRepository _customerRepository;
+        private readonly IProductRepository _productRepository;
+        private readonly IOrderRepository _orderRepository;
+
+        public ReportManager(
+            ICategoryRepository categoryRepository,
+            ICustomerRepository customerRepository,
+            IProductRepository productRepository,
+            IOrderRepository orderRepository)
+        {
+            _categoryRepository = categoryRepository;
+            _customerRepository = customerRepository;
+            _productRepository = productRepository;
+            _orderRepository = orderRepository;
+        }
+
+        public GeneralStatisticsReport GetGeneralStatistics()
+        {
+            var categories = _categoryRepository.GetAll();
+            var customers = _customerRepository.GetAll();
+            var products = _productRepository.GetAll();
+            var orders = _orderRepository.GetAll();
+
+            GeneralStatisticsReport report = new GeneralStatisticsReport
+            {
+                TotalCategories = categories.Count,
+                TotalCustomers = customers.Count,
+                TotalProducts = products.Count,
+                TotalOrders = orders.Count,
+                TotalStock = products.Sum(x => x.ProductStock),
+                LowStockProducts = products.Count(x => x.ProductStock < 10),
+                OutOfStockProducts = products.Count(x => x.ProductStock == 0)
+            };
+
+            return report;
+        }
+    }
+}
+
+
+-------------------------------------------------------------------------
+
+
+public void ShowGeneralStatistics()
+{
+    ConsoleRestaurantDesign.WriteHeader("Genel Ýstatistikler");
+
+    GeneralStatisticsReport report =
+        _reportService.GetGeneralStatistics();
+
+    Console.ForegroundColor = ConsoleColor.Yellow;
+    Console.WriteLine("  -------- GENEL VERÝLER --------");
+    Console.ResetColor();
+
+    Console.WriteLine($"  Toplam Kategori       : {report.TotalCategories}");
+    Console.WriteLine($"  Toplam Müþteri        : {report.TotalCustomers}");
+    Console.WriteLine($"  Toplam Ürün           : {report.TotalProducts}");
+    Console.WriteLine($"  Toplam Sipariþ        : {report.TotalOrders}");
+
+    Console.WriteLine();
+
+    Console.ForegroundColor = ConsoleColor.Yellow;
+    Console.WriteLine("  -------- STOK VERÝLERÝ --------");
+    Console.ResetColor();
+
+    Console.WriteLine($"  Toplam Stok Adedi     : {report.TotalStock}");
+    Console.WriteLine($"  Düþük Stoklu Ürün     : {report.LowStockProducts}");
+    Console.WriteLine($"  Stoðu Tükenen Ürün   : {report.OutOfStockProducts}");
+
+    Console.WriteLine();
+
+    ConsoleRestaurantDesign.WriteSuccess(
+        "Genel istatistikler baþarýyla getirildi.");
+
+    ConsoleRestaurantDesign.WaitForKey();
+}
+
+
+
+-------------------------------------------------------------------------
+
+
+namespace CommerceFlow.Business.Reports
+{
+    public class OrderStatusReport
+    {
+        public int TotalOrders { get; set; }
+
+        public int PreparingOrders { get; set; }
+        public int ShippingOrders { get; set; }
+        public int DeliveredOrders { get; set; }
+        public int CancelledOrders { get; set; }
+
+        public double PreparingRate { get; set; }
+        public double ShippingRate { get; set; }
+        public double DeliveredRate { get; set; }
+        public double CancelledRate { get; set; }
+    }
+}
+
+
+
+-------------------------------------------------------------------------
+
+
+public OrderStatusReport GetOrderStatusReport()
+{
+    var orders = _orderRepository.GetAll();
+
+    int totalOrders = orders.Count;
+
+    int preparingOrders = orders.Count(
+        x => x.OrderStatus == "Hazýrlanýyor");
+
+    int shippingOrders = orders.Count(
+        x => x.OrderStatus == "Kargoda");
+
+    int deliveredOrders = orders.Count(
+        x => x.OrderStatus == "Teslim Edildi");
+
+    int cancelledOrders = orders.Count(
+        x => x.OrderStatus == "Ýptal Edildi");
+
+    OrderStatusReport report = new OrderStatusReport
+    {
+        TotalOrders = totalOrders,
+
+        PreparingOrders = preparingOrders,
+        ShippingOrders = shippingOrders,
+        DeliveredOrders = deliveredOrders,
+        CancelledOrders = cancelledOrders,
+
+        PreparingRate = totalOrders > 0
+            ? (double)preparingOrders / totalOrders * 100
+            : 0,
+
+        ShippingRate = totalOrders > 0
+            ? (double)shippingOrders / totalOrders * 100
+            : 0,
+
+        DeliveredRate = totalOrders > 0
+            ? (double)deliveredOrders / totalOrders * 100
+            : 0,
+
+        CancelledRate = totalOrders > 0
+            ? (double)cancelledOrders / totalOrders * 100
+            : 0
+    };
+
+    return report;
+}
+
+
+-------------------------------------------------------------------------
+
+
+public void ShowOrderStatusReport()
+{
+    ConsoleRestaurantDesign.WriteHeader("Sipariþ Durumu Raporu");
+
+    OrderStatusReport report = _reportService.GetOrderStatusReport();
+
+    if (report.TotalOrders == 0)
+    {
+        ConsoleRestaurantDesign.WriteInfo(
+            "Raporlanacak sipariþ bulunamadý.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    Console.ForegroundColor = ConsoleColor.Yellow;
+
+    Console.WriteLine(
+        $"  {"SÝPARÝÞ DURUMU",-22} {"ADET",-12} {"ORAN",-12}");
+
+    Console.WriteLine(new string('-', 50));
+
+    Console.ResetColor();
+
+    Console.ForegroundColor = ConsoleColor.Yellow;
+    Console.WriteLine(
+        $"  {"Hazýrlanýyor",-22} {report.PreparingOrders,-12} %{report.PreparingRate:N2}");
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.WriteLine(
+        $"  {"Kargoda",-22} {report.ShippingOrders,-12} %{report.ShippingRate:N2}");
+
+    Console.ForegroundColor = ConsoleColor.Green;
+    Console.WriteLine(
+        $"  {"Teslim Edildi",-22} {report.DeliveredOrders,-12} %{report.DeliveredRate:N2}");
+
+    Console.ForegroundColor = ConsoleColor.Red;
+    Console.WriteLine(
+        $"  {"Ýptal Edildi",-22} {report.CancelledOrders,-12} %{report.CancelledRate:N2}");
+
+    Console.ResetColor();
+
+    Console.WriteLine(new string('-', 50));
+    Console.WriteLine();
+
+    ConsoleRestaurantDesign.WriteSuccess(
+        $"Toplam Sipariþ Sayýsý: {report.TotalOrders}");
+
+    ConsoleRestaurantDesign.WaitForKey();
+}
+
+
+-------------------------------------------------------------------------
+
+
+namespace CommerceFlow.Business.Reports
+{
+    public class SalesReport
+    {
+        public decimal TotalOrderAmount { get; set; }
+        public decimal CompletedRevenue { get; set; }
+        public decimal PendingAmount { get; set; }
+        public decimal CancelledAmount { get; set; }
+
+        public decimal AverageOrderAmount { get; set; }
+        public decimal HighestOrderAmount { get; set; }
+
+        public int TotalOrders { get; set; }
+        public int ValidOrders { get; set; }
+    }
+}
+
+
+-------------------------------------------------------------------------
+
+
+public SalesReport GetSalesReport()
+{
+    var orders = _orderRepository.GetAll();
+
+    decimal totalOrderAmount = orders.Sum(x => x.OrderTotalPrice);
+
+    decimal completedRevenue = orders
+        .Where(x => x.OrderStatus == "Teslim Edildi")
+        .Sum(x => x.OrderTotalPrice);
+
+    decimal pendingAmount = orders
+        .Where(x => x.OrderStatus == "Hazýrlanýyor" ||
+                    x.OrderStatus == "Kargoda")
+        .Sum(x => x.OrderTotalPrice);
+
+    decimal cancelledAmount = orders
+        .Where(x => x.OrderStatus == "Ýptal Edildi")
+        .Sum(x => x.OrderTotalPrice);
+
+    var validOrders = orders
+        .Where(x => x.OrderStatus != "Ýptal Edildi")
+        .ToList();
+
+    decimal averageOrderAmount = validOrders.Count > 0
+        ? validOrders.Average(x => x.OrderTotalPrice)
+        : 0;
+
+    decimal highestOrderAmount = orders.Count > 0
+        ? orders.Max(x => x.OrderTotalPrice)
+        : 0;
+
+    SalesReport report = new SalesReport
+    {
+        TotalOrderAmount = totalOrderAmount,
+        CompletedRevenue = completedRevenue,
+        PendingAmount = pendingAmount,
+        CancelledAmount = cancelledAmount,
+        AverageOrderAmount = averageOrderAmount,
+        HighestOrderAmount = highestOrderAmount,
+        TotalOrders = orders.Count,
+        ValidOrders = validOrders.Count
+    };
+
+    return report;
+}
+
+-------------------------------------------------------------------------
+
+
+public void ShowSalesReport()
+{
+    ConsoleRestaurantDesign.WriteHeader("Satýþ ve Ciro Raporu");
+
+    SalesReport report = _reportService.GetSalesReport();
+
+    if (report.TotalOrders == 0)
+    {
+        ConsoleRestaurantDesign.WriteInfo("Raporlanacak sipariþ bulunamadý.");
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    Console.ForegroundColor = ConsoleColor.Yellow;
+    Console.WriteLine("  -------- SATIÞ VE CÝRO BÝLGÝLERÝ --------");
+    Console.ResetColor();
+
+    Console.WriteLine();
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Toplam Sipariþ Tutarý      : ");
+    Console.ForegroundColor = ConsoleColor.White;
+    Console.WriteLine($"{report.TotalOrderAmount:N2} TL");
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Gerçekleþen Ciro           : ");
+    Console.ForegroundColor = ConsoleColor.Green;
+    Console.WriteLine($"{report.CompletedRevenue:N2} TL");
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Bekleyen Sipariþ Tutarý    : ");
+    Console.ForegroundColor = ConsoleColor.Yellow;
+    Console.WriteLine($"{report.PendingAmount:N2} TL");
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Ýptal Edilen Sipariþ Tutarý: ");
+    Console.ForegroundColor = ConsoleColor.Red;
+    Console.WriteLine($"{report.CancelledAmount:N2} TL");
+
+    Console.ResetColor();
+    Console.WriteLine();
+
+    Console.ForegroundColor = ConsoleColor.Yellow;
+    Console.WriteLine("  -------- SÝPARÝÞ ANALÝZÝ --------");
+    Console.ResetColor();
+
+    Console.WriteLine();
+
+    Console.WriteLine($"  Ortalama Sipariþ Tutarý    : {report.AverageOrderAmount:N2} TL");
+    Console.WriteLine($"  En Yüksek Sipariþ Tutarý   : {report.HighestOrderAmount:N2} TL");
+    Console.WriteLine($"  Toplam Sipariþ Sayýsý      : {report.TotalOrders}");
+    Console.WriteLine($"  Geçerli Sipariþ Sayýsý     : {report.ValidOrders}");
+
+    Console.WriteLine();
+
+    ConsoleRestaurantDesign.WriteSuccess(
+        "Satýþ ve ciro raporu baþarýyla oluþturuldu.");
+
+    ConsoleRestaurantDesign.WaitForKey();
+}
+
+
+-------------------------------------------------------------------------
+
+
+namespace CommerceFlow.Business.Reports
+{
+    public class StockReport
+    {
+        public int TotalProducts { get; set; }
+        public int TotalStock { get; set; }
+        public decimal TotalStockValue { get; set; }
+
+        public int OutOfStock { get; set; }
+        public int LowStock { get; set; }
+        public int SufficientStock { get; set; }
+
+        public string? HighestStockProductName { get; set; }
+        public int HighestStockQuantity { get; set; }
+
+        public string? LowestStockProductName { get; set; }
+        public int LowestStockQuantity { get; set; }
+    }
+}
+
+
+-------------------------------------------------------------------------
+
+
+public StockReport GetStockReport()
+{
+    var products = _productRepository.GetAll();
+
+    int totalProducts = products.Count;
+    int totalStock = products.Sum(x => x.ProductStock);
+
+    decimal totalStockValue = products.Sum(
+        x => x.ProductPrice * x.ProductStock);
+
+    int outOfStock = products.Count(
+        x => x.ProductStock == 0);
+
+    int lowStock = products.Count(
+        x => x.ProductStock > 0 && x.ProductStock < 10);
+
+    int sufficientStock = products.Count(
+        x => x.ProductStock >= 10);
+
+    var highestStockProduct = products
+        .OrderByDescending(x => x.ProductStock)
+        .FirstOrDefault();
+
+    var lowestStockProduct = products
+        .OrderBy(x => x.ProductStock)
+        .FirstOrDefault();
+
+    StockReport report = new StockReport
+    {
+        TotalProducts = totalProducts,
+        TotalStock = totalStock,
+        TotalStockValue = totalStockValue,
+
+        OutOfStock = outOfStock,
+        LowStock = lowStock,
+        SufficientStock = sufficientStock,
+
+        HighestStockProductName = highestStockProduct?.ProductName,
+        HighestStockQuantity = highestStockProduct?.ProductStock ?? 0,
+
+        LowestStockProductName = lowestStockProduct?.ProductName,
+        LowestStockQuantity = lowestStockProduct?.ProductStock ?? 0
+    };
+
+    return report;
+}
+
+
+-------------------------------------------------------------------------
+
+
+public void ShowStockReport()
+{
+    ConsoleRestaurantDesign.WriteHeader("Stok Durumu Raporu");
+
+    StockReport report = _reportService.GetStockReport();
+
+    if (report.TotalProducts == 0)
+    {
+        ConsoleRestaurantDesign.WriteInfo("Raporlanacak ürün bulunamadý.");
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    Console.ForegroundColor = ConsoleColor.Yellow;
+    Console.WriteLine("  -------- GENEL STOK BÝLGÝLERÝ --------");
+    Console.ResetColor();
+
+    Console.WriteLine();
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Toplam Ürün Çeþidi   : ");
+    Console.ForegroundColor = ConsoleColor.White;
+    Console.WriteLine(report.TotalProducts);
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Toplam Stok Adedi    : ");
+    Console.ForegroundColor = ConsoleColor.White;
+    Console.WriteLine(report.TotalStock);
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("  Toplam Stok Deðeri   : ");
+    Console.ForegroundColor = ConsoleColor.Green;
+    Console.WriteLine($"{report.TotalStockValue:N2} TL");
+
+    Console.ResetColor();
+    Console.WriteLine();
+
+    Console.ForegroundColor = ConsoleColor.Yellow;
+    Console.WriteLine("  -------- STOK DURUMU DAÐILIMI --------");
+    Console.ResetColor();
+
+    Console.WriteLine();
+
+    Console.ForegroundColor = ConsoleColor.Red;
+    Console.WriteLine($"  Stoðu Tükenen Ürünler : {report.OutOfStock}");
+
+    Console.ForegroundColor = ConsoleColor.Yellow;
+    Console.WriteLine($"  Düþük Stoklu Ürünler  : {report.LowStock}");
+
+    Console.ForegroundColor = ConsoleColor.Green;
+    Console.WriteLine($"  Yeterli Stoklu Ürünler: {report.SufficientStock}");
+
+    Console.ResetColor();
+    Console.WriteLine();
+
+    Console.ForegroundColor = ConsoleColor.Yellow;
+    Console.WriteLine("  -------- STOK ANALÝZÝ --------");
+    Console.ResetColor();
+
+    Console.WriteLine();
+
+    if (report.HighestStockProductName != null)
+    {
+        Console.WriteLine($"  En Fazla Stok: {report.HighestStockProductName}");
+        ConsoleRestaurantDesign.WriteInfo(
+            $"  Stok Miktarý: {report.HighestStockQuantity}");
+    }
+
+    Console.WriteLine();
+
+    if (report.LowestStockProductName != null)
+    {
+        Console.WriteLine($"  En Az Stok: {report.LowestStockProductName}");
+        ConsoleRestaurantDesign.WriteInfo(
+            $"  Stok Miktarý: {report.LowestStockQuantity}");
+    }
+
+    Console.WriteLine();
+
+    ConsoleRestaurantDesign.WriteSuccess(
+        "Stok raporu baþarýyla oluþturuldu.");
+
+    ConsoleRestaurantDesign.WaitForKey();
+}
+
+
+-------------------------------------------------------------------------
+
+
+namespace CommerceFlow.Business.Reports
+{
+    public class CategoryProductReport
+    {
+        public List<CategoryProductReportItem> Categories { get; set; }
+            = new List<CategoryProductReportItem>();
+
+        public int TotalCategories { get; set; }
+        public int TotalProducts { get; set; }
+        public int TotalStock { get; set; }
+        public decimal TotalStockValue { get; set; }
+    }
+}
+
+
+-------------------------------------------------------------------------
+
+
+namespace CommerceFlow.Business.Reports
+{
+    public class CategoryProductReportItem
+    {
+        public int CategoryId { get; set; }
+        public string CategoryName { get; set; } = string.Empty;
+
+        public int ProductCount { get; set; }
+        public int TotalStock { get; set; }
+        public decimal StockValue { get; set; }
+    }
+}
+
+
+-------------------------------------------------------------------------
+
+
+public CategoryProductReport GetCategoryProductReport()
+{
+    var categories = _categoryRepository.GetAll();
+    var products = _productRepository.GetAll();
+
+    var productGroups = products
+        .GroupBy(x => x.CategoryId)
+        .ToDictionary(
+            x => x.Key,
+            x => new
+            {
+                ProductCount = x.Count(),
+                TotalStock = x.Sum(p => p.ProductStock),
+                StockValue = x.Sum(
+                    p => p.ProductPrice * p.ProductStock)
+            });
+
+    List<CategoryProductReportItem> categoryItems =
+        new List<CategoryProductReportItem>();
+
+    foreach (var category in categories)
+    {
+        bool hasProducts = productGroups.TryGetValue(
+            category.CategoryId, out var group);
+
+        CategoryProductReportItem item =
+            new CategoryProductReportItem
+            {
+                CategoryId = category.CategoryId,
+                CategoryName = category.CategoryName,
+                ProductCount = hasProducts ? group!.ProductCount : 0,
+                TotalStock = hasProducts ? group!.TotalStock : 0,
+                StockValue = hasProducts ? group!.StockValue : 0
+            };
+
+        categoryItems.Add(item);
+    }
+
+    CategoryProductReport report = new CategoryProductReport
+    {
+        Categories = categoryItems,
+        TotalCategories = categories.Count,
+        TotalProducts = products.Count,
+        TotalStock = products.Sum(x => x.ProductStock),
+        TotalStockValue = products.Sum(
+            x => x.ProductPrice * x.ProductStock)
+    };
+
+    return report;
+}
+
+-------------------------------------------------------------------------
+
+
+public void ShowCategoryProductReport()
+{
+    ConsoleRestaurantDesign.WriteHeader("Kategori Bazlý Ürün Raporu");
+
+    CategoryProductReport report =
+        _reportService.GetCategoryProductReport();
+
+    if (report.TotalCategories == 0)
+    {
+        ConsoleRestaurantDesign.WriteInfo(
+            "Raporlanacak kategori bulunamadý.");
+
+        ConsoleRestaurantDesign.WaitForKey();
+        return;
+    }
+
+    Console.ForegroundColor = ConsoleColor.Yellow;
+
+    Console.WriteLine(
+        $"  {"KATEGORÝ ADI",-35} {"ÜRÜN",-8} {"STOK",-10} {"STOK DEÐERÝ",-20}");
+
+    Console.WriteLine(new string('-', 80));
+
+    Console.ResetColor();
+
+    foreach (CategoryProductReportItem category in report.Categories)
+    {
+        Console.ForegroundColor = ConsoleColor.Cyan;
+        Console.Write($"  {category.CategoryName,-35}");
+
+        Console.ForegroundColor = ConsoleColor.White;
+        Console.Write($"{category.ProductCount,-8}");
+        Console.Write($"{category.TotalStock,-10}");
+
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.WriteLine($"{category.StockValue,-20:N2}");
+    }
+
+    Console.ResetColor();
+
+    Console.WriteLine(new string('-', 80));
+    Console.WriteLine();
+
+    Console.ForegroundColor = ConsoleColor.Yellow;
+    Console.WriteLine("  -------- GENEL TOPLAMLAR --------");
+    Console.ResetColor();
+
+    Console.WriteLine();
+
+    Console.WriteLine($"  Toplam Kategori  : {report.TotalCategories}");
+    Console.WriteLine($"  Toplam Ürün      : {report.TotalProducts}");
+    Console.WriteLine($"  Toplam Stok      : {report.TotalStock}");
+
+    Console.ForegroundColor = ConsoleColor.Green;
+    Console.WriteLine($"  Toplam Stok Deðeri : {report.TotalStockValue:N2} TL");
+
+    Console.ResetColor();
+    Console.WriteLine();
+
+    ConsoleRestaurantDesign.WriteSuccess(
+        "Kategori bazlý ürün raporu baþarýyla oluþturuldu.");
+
+    ConsoleRestaurantDesign.WaitForKey();
+}

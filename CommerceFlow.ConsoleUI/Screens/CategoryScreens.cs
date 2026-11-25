@@ -2,11 +2,6 @@
 using CommerceFlow.Business.Results;
 using CommerceFlow.ConsoleUI.Helpers;
 using CommerceFlow.Entities.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CommerceFlow.ConsoleUI.Screens
 {
@@ -17,7 +12,6 @@ namespace CommerceFlow.ConsoleUI.Screens
         {
             _categoryService = categoryService;
         }
-
         public void ShowCategories()
         {
             ConsoleRestaurantDesign.WriteHeader("Kategori Listesi");
@@ -56,8 +50,6 @@ namespace CommerceFlow.ConsoleUI.Screens
             ConsoleRestaurantDesign.WriteSuccess($"Toplam {categories.Count} kategori listelendi.");
             ConsoleRestaurantDesign.WaitForKey();
         }
-
-
         public void AddCategory()
         {
             ConsoleRestaurantDesign.WriteHeader("Yeni Kategori Ekle");
@@ -74,20 +66,9 @@ namespace CommerceFlow.ConsoleUI.Screens
             };
 
             ServiceResult result = _categoryService.AddCategory(category);
-
-            if (result.IsSuccess)
-            {
-                ConsoleRestaurantDesign.WriteSuccess(result.Message);
-            }
-            else
-            {
-                ConsoleRestaurantDesign.WriteError(result.Message);
-            }
-
+            ConsoleRestaurantDesign.WriteResult(result);
             ConsoleRestaurantDesign.WaitForKey();
         }
-
-
         public void ShowCategoryDetail()
         {
             ConsoleRestaurantDesign.WriteHeader("Kategori Detayı");
@@ -139,7 +120,6 @@ namespace CommerceFlow.ConsoleUI.Screens
             ConsoleRestaurantDesign.WriteSuccess("Kategori bilgileri başarıyla getirildi.");
             ConsoleRestaurantDesign.WaitForKey();
         }
-
         public void DeleteCategory()
         {
             ConsoleRestaurantDesign.WriteHeader("Kategori Silme");
@@ -192,20 +172,21 @@ namespace CommerceFlow.ConsoleUI.Screens
                 return;
             }
 
-            try
+
+            ServiceResult result = _categoryService.DeleteCategory(categoryId);
+
+            if (result.IsSuccess)
             {
-                _categoryService.DeleteCategory(categoryId);
+                ConsoleRestaurantDesign.WriteSuccess(result.Message);
             }
-            catch (Microsoft.EntityFrameworkCore.DbUpdateException)
+            else
             {
-                ConsoleRestaurantDesign.WriteError("Kategori silinemedi. İlişkili ürün kayıtları bulunuyor olabilir.");
+                ConsoleRestaurantDesign.WriteError(result.Message);
             }
+
 
             ConsoleRestaurantDesign.WaitForKey();
         }
-
-
-
         public void UpdateCategory()
         {
             ConsoleRestaurantDesign.WriteHeader("Kategori Güncelleme");
@@ -283,24 +264,11 @@ namespace CommerceFlow.ConsoleUI.Screens
                 CategoryName = newCategoryName ?? string.Empty
             };
 
-            ServiceResult result =
-                _categoryService.UpdateCategory(updatedCategory);
 
-            if (result.IsSuccess)
-            {
-                ConsoleRestaurantDesign.WriteSuccess(result.Message);
-            }
-            else
-            {
-                ConsoleRestaurantDesign.WriteError(result.Message);
-            }
-
+            ServiceResult result = _categoryService.UpdateCategory(updatedCategory);
+            ConsoleRestaurantDesign.WriteResult(result);
             ConsoleRestaurantDesign.WaitForKey();
         }
-
-
-
-
         public void ShowPlaceholder(string title)
         {
             ConsoleRestaurantDesign.WriteHeader(title);

@@ -8,7 +8,10 @@ using CommerceFlow.DataAccess.Repositories;
 Console.Title = "CommerceFlow - E-Ticaret Yönetim Sistemi";
 
 ICategoryRepository categoryRepository = new CategoryRepository();
-ICategoryService categoryService = new CategoryManager(categoryRepository);
+IProductRepository productRepository = new ProductRepository();
+
+
+ICategoryService categoryService = new CategoryManager(categoryRepository, productRepository);
 CategoryScreens categoryScreens = new CategoryScreens(categoryService);
 CategoryMenu categoryMenu = new CategoryMenu(categoryScreens);
 
@@ -17,7 +20,6 @@ ICustomerService customerService = new CustomerManager(customerRepository);
 CustomerScreens customerScreens = new CustomerScreens(customerService);
 CustomerMenu customerMenu = new CustomerMenu(customerScreens);
 
-IProductRepository productRepository = new ProductRepository();
 IProductService productService = new ProductManager(productRepository);
 ProductScreens productScreens = new ProductScreens(productService, categoryService);
 ProductMenu productMenu = new ProductMenu(productScreens);
@@ -28,8 +30,9 @@ IOrderService orderService = new OrderManager(orderRepository, productRepository
 OrderScreens orderScreens = new OrderScreens(orderService, productService, customerService);
 OrderMenu orderMenu = new OrderMenu(orderScreens);
 
+IReportService reportService = new ReportManager(categoryRepository, customerRepository, productRepository, orderRepository);
 
-ReportScreens reportScreens = new ReportScreens(categoryService, customerService, productService, orderService);
+ReportScreens reportScreens = new ReportScreens(categoryService, customerService, productService, orderService, reportService);
 ReportMenu reportMenu = new ReportMenu(reportScreens);
 
 MainMenu mainMenu = new MainMenu(categoryMenu, customerMenu, productMenu, orderMenu, reportMenu);

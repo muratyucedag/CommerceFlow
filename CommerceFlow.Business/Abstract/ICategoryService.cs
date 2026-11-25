@@ -8,7 +8,7 @@ namespace CommerceFlow.Business.Abstract
     {
         ServiceResult AddCategory(Category category);
         ServiceResult UpdateCategory(Category category);
-        void DeleteCategory(int id);
+        ServiceResult DeleteCategory(int id);
         List<Category> GetAllCategories();
         Category? GetCategoryById(int id);
     }

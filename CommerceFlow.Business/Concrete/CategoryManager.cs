@@ -8,9 +8,11 @@ namespace CommerceFlow.Business.Concrete
     public class CategoryManager : ICategoryService
     {
         private readonly ICategoryRepository _categoryRepository;
-        public CategoryManager(ICategoryRepository categoryRepository)
+        private readonly IProductRepository _productRepository;
+        public CategoryManager(ICategoryRepository categoryRepository, IProductRepository productRepository)
         {
             _categoryRepository = categoryRepository;
+            _productRepository = productRepository;
         }
 
         public ServiceResult AddCategory(Category category)
@@ -56,7 +58,6 @@ namespace CommerceFlow.Business.Concrete
                 Message = "Kategori başarıyla eklendi."
             };
         }
-
 
         public ServiceResult UpdateCategory(Category category)
         {
@@ -118,34 +119,43 @@ namespace CommerceFlow.Business.Concrete
                 Message = "Kategori başarıyla güncellendi."
             };
         }
-
-
-        public void DeleteCategory(int id)
+        public ServiceResult DeleteCategory(int id)
         {
-            if (id <= 0)
-            {
-                Console.WriteLine("Geçersiz kategori ID değeri.");
-                return;
-            }
-
             Category? category = _categoryRepository.GetById(id);
 
             if (category == null)
             {
-                Console.WriteLine("Silinecek kategori bulunamadı.");
-                return;
+                return new ServiceResult
+                {
+                    IsSuccess = false,
+                    Message = "Silinecek kategori bulunamadı."
+                };
+            }
+
+            bool hasProducts = _productRepository.GetAll().Any(x => x.CategoryId == id);
+
+            if (hasProducts)
+            {
+                return new ServiceResult
+                {
+                    IsSuccess = false,
+                    Message = "Bu kategoriye bağlı ürünler bulunduğu için silme işlemi yapılamaz."
+                };
             }
 
             _categoryRepository.Delete(category);
 
-            Console.WriteLine("Kategori başarıyla silindi.");
+            return new ServiceResult
+            {
+                IsSuccess = true,
+                Message = "Kategori başarıyla silindi."
+            };
         }
 
         public List<Category> GetAllCategories()
         {
             return _categoryRepository.GetAll();
         }
-
         public Category? GetCategoryById(int id)
         {
             if (id <= 0)

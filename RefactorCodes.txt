@@ -250,6 +250,77 @@ public void UpdateCategory()
 }
 
 ---------------------------------------------------------------------
+
+
+public ServiceResult DeleteCategory(int id)
+{
+    Category? category = _categoryRepository.GetById(id);
+
+    if (category == null)
+    {
+        return new ServiceResult
+        {
+            IsSuccess = false,
+            Message = "Silinecek kategori bulunamadý."
+        };
+    }
+
+    bool hasProducts = _productRepository.GetAll()
+        .Any(x => x.CategoryId == id);
+
+    if (hasProducts)
+    {
+        return new ServiceResult
+        {
+            IsSuccess = false,
+            Message = "Bu kategoriye baðlý ürünler bulunduðu için silme iþlemi yapýlamaz."
+        };
+    }
+
+    _categoryRepository.Delete(category);
+
+    return new ServiceResult
+    {
+        IsSuccess = true,
+        Message = "Kategori baþarýyla silindi."
+    };
+}
+
+
+
+---------------------------------------------------------------------
+
+
+ServiceResult result = _categoryService.DeleteCategory(categoryId);
+
+if (result.IsSuccess)
+{
+    ConsoleRestaurantDesign.WriteSuccess(result.Message);
+}
+else
+{
+    ConsoleRestaurantDesign.WriteError(result.Message);
+}
+
+
+---------------------------------------------------------------------
+
+
+public static void WriteResult(ServiceResult result)
+{
+    if (result.IsSuccess)
+    {
+        WriteSuccess(result.Message);
+    }
+    else
+    {
+        WriteError(result.Message);
+    }
+}
+
+
+
+---------------------------------------------------------------------
 ---------------------------------------------------------------------
 ---------------------------------------------------------------------
 
